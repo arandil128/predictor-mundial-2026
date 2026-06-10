@@ -21,6 +21,37 @@ async function loadTeams() {
     $("#status").textContent =
       "Sin clave de cuotas: el modelo usa Elo + ranking FIFA. Cargá ODDS_API_KEY para sumar el mercado.";
   }
+  showEloStatus(data.elo_refreshed_at);
+}
+
+function showEloStatus(iso) {
+  const el = $("#eloStatus");
+  if (!iso) {
+    el.textContent = "Elo: dataset base";
+    return;
+  }
+  const d = new Date(iso);
+  el.textContent = "Elo actualizado " + d.toLocaleString("es-AR");
+}
+
+async function refreshElo() {
+  const btn = $("#refreshElo");
+  const icon = $("#refreshIcon");
+  btn.disabled = true;
+  icon.classList.add("inline-block", "animate-spin");
+  $("#eloStatus").textContent = "Descargando ratings…";
+  try {
+    const res = await fetch("/api/refresh-ratings", { method: "POST" });
+    if (!res.ok) throw new Error("No se pudo actualizar.");
+    const d = await res.json();
+    showEloStatus(d.refreshed_at);
+    $("#eloStatus").textContent += ` · ${d.updated}/${d.total} equipos`;
+  } catch (e) {
+    $("#eloStatus").textContent = e.message;
+  } finally {
+    btn.disabled = false;
+    icon.classList.remove("animate-spin");
+  }
 }
 
 function bar(container, label, prob, color) {
@@ -164,4 +195,5 @@ $("#sims").addEventListener("input", (e) => {
   $("#simsLabel").textContent = (+e.target.value).toLocaleString("es-AR");
 });
 $("#run").addEventListener("click", run);
+$("#refreshElo").addEventListener("click", refreshElo);
 loadTeams();

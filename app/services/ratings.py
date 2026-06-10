@@ -80,5 +80,73 @@ DEFAULT_ELO = 1700.0
 
 
 def elo_of(name: str) -> float:
+    key = _normalize(name)
+    if key in _overrides:
+        return _overrides[key]
     rating = get_rating(name)
     return rating.elo if rating else DEFAULT_ELO
+
+
+# --- Refresco a requerimiento de los ratings Elo (fuente abierta, sin clave) ---
+#
+# eloratings.net publica dos archivos gratuitos: World.tsv (código->Elo actual)
+# y en.teams.tsv (código->nombre). Cruzamos por NOMBRE (robusto) y guardamos los
+# valores como "overrides" en memoria. NO hay polling automático: solo se dispara
+# cuando el usuario lo pide (botón/endpoint), para no gastar nada y ser predecible.
+import httpx  # noqa: E402  (import local para mantener el módulo liviano arriba)
+from datetime import datetime, timezone  # noqa: E402
+
+ELO_NAMES_URL = "https://www.eloratings.net/en.teams.tsv"
+ELO_WORLD_URL = "https://www.eloratings.net/World.tsv"
+
+_overrides: dict[str, float] = {}
+_last_refresh: str | None = None
+
+
+def last_refresh() -> str | None:
+    """ISO timestamp del último refresco en vivo, o None si nunca se hizo."""
+    return _last_refresh
+
+
+async def refresh_from_source() -> dict:
+    """Descarga los Elo actuales y actualiza los overrides en memoria."""
+    global _last_refresh
+    async with httpx.AsyncClient(timeout=20) as client:
+        names_resp = await client.get(ELO_NAMES_URL)
+        names_resp.raise_for_status()
+        world_resp = await client.get(ELO_WORLD_URL)
+        world_resp.raise_for_status()
+
+    code2name: dict[str, str] = {}
+    for line in names_resp.text.splitlines():
+        parts = line.split("\t")
+        if len(parts) >= 2 and parts[0]:
+            code2name[parts[0]] = parts[1]
+
+    name2elo: dict[str, float] = {}
+    for line in world_resp.text.splitlines():
+        cols = line.split("\t")
+        if len(cols) > 3 and cols[2] in code2name:
+            try:
+                name2elo[_normalize(code2name[cols[2]])] = float(cols[3])
+            except ValueError:
+                continue
+
+    new_overrides: dict[str, float] = {}
+    updated = 0
+    for rating in all_teams():
+        key = _normalize(rating.team)
+        if key in name2elo:
+            elo = name2elo[key]
+            new_overrides[key] = elo
+            new_overrides[_normalize(rating.code)] = elo
+            updated += 1
+
+    _overrides.clear()
+    _overrides.update(new_overrides)
+    _last_refresh = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return {
+        "updated": updated,
+        "total": len(all_teams()),
+        "refreshed_at": _last_refresh,
+    }

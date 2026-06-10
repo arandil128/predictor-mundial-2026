@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from app.config import STATIC_DIR, get_settings
 from app.model import blend as blend_mod
 from app.model.montecarlo import simulate
-from app.services import fixtures
+from app.services import fixtures, ratings
 from app.services.odds import get_market_probs
 from app.services.ratings import elo_of, get_rating
 
@@ -33,7 +33,17 @@ async def api_matches() -> dict:
             "odds": settings.has_odds,
             "fixtures": settings.has_fixtures,
         },
+        "elo_refreshed_at": ratings.last_refresh(),
     }
+
+
+@app.post("/api/refresh-ratings")
+async def api_refresh_ratings() -> dict:
+    """Actualiza los ratings Elo en vivo (a requerimiento, fuente abierta gratuita)."""
+    try:
+        return await ratings.refresh_from_source()
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(502, f"No se pudieron actualizar los ratings: {exc}")
 
 
 @app.post("/api/simulate")
