@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: predictor-mundial-2026
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ODDS_API_KEY
+        sync: false
+      - key: FOOTBALL_DATA_API_KEY
+        sync: false
+      - key: API_FOOTBALL_KEY
+        sync: false
+      - key: MARKET_BLEND_WEIGHT
+        value: "0.65"
+      - key: CACHE_TTL_SECONDS
+        value: "300"

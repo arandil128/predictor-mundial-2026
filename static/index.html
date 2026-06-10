@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Predicción Mundial 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .bar { transition: width .6s cubic-bezier(.22,1,.36,1); }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+  <div class="mx-auto max-w-2xl px-5 py-10 sm:py-16">
+
+    <header class="mb-10 text-center">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+        <span class="bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent">Mundial 2026</span>
+        · Predictor
+      </h1>
+      <p class="mt-2 text-slate-400 text-sm sm:text-base">
+        Simulación Monte Carlo combinando Elo, ranking FIFA y cuotas en vivo.
+      </p>
+    </header>
+
+    <!-- Panel de entrada -->
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 shadow-xl backdrop-blur">
+      <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-end gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Local</label>
+          <select id="home" class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></select>
+        </div>
+        <div class="hidden sm:block pb-2.5 text-center text-slate-500 font-semibold">vs</div>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Visitante</label>
+          <select id="away" class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"></select>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs font-medium text-slate-400">Cantidad de simulaciones</label>
+          <span id="simsLabel" class="text-sm font-semibold text-emerald-400">10.000</span>
+        </div>
+        <input id="sims" type="range" min="1000" max="200000" step="1000" value="10000"
+               class="w-full accent-emerald-500" />
+        <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+          <span>1.000</span><span>más simulaciones = más estable</span><span>200.000</span>
+        </div>
+      </div>
+
+      <button id="run" class="mt-6 w-full rounded-lg bg-gradient-to-r from-emerald-500 to-sky-500 py-3 font-semibold text-slate-950 hover:opacity-90 active:scale-[.99] transition disabled:opacity-50">
+        Simular partido
+      </button>
+      <p id="status" class="mt-3 text-center text-xs text-slate-500"></p>
+    </section>
+
+    <!-- Resultados -->
+    <section id="results" class="mt-8 hidden space-y-6">
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 id="matchTitle" class="text-lg font-bold"></h2>
+          <span id="simInfo" class="text-xs text-slate-500"></span>
+        </div>
+
+        <!-- Barras 1X2 -->
+        <div class="space-y-3">
+          <div data-row="home"></div>
+          <div data-row="draw"></div>
+          <div data-row="away"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <h3 class="text-sm font-semibold text-slate-300 mb-3">Marcador esperado</h3>
+          <p id="expScore" class="text-3xl font-extrabold tracking-tight"></p>
+          <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div class="rounded-lg bg-slate-800/60 px-3 py-2">
+              <div class="text-slate-400 text-xs">Más de 2.5 goles</div>
+              <div id="over25" class="font-semibold"></div>
+            </div>
+            <div class="rounded-lg bg-slate-800/60 px-3 py-2">
+              <div class="text-slate-400 text-xs">Ambos marcan</div>
+              <div id="btts" class="font-semibold"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+          <h3 class="text-sm font-semibold text-slate-300 mb-3">Marcadores más probables</h3>
+          <ul id="scorelines" class="space-y-2 text-sm"></ul>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+        <h3 class="text-sm font-semibold text-slate-300 mb-3">Distribución de goles totales</h3>
+        <canvas id="goalsChart" height="120"></canvas>
+      </div>
+
+      <div id="compareCard" class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+        <h3 class="text-sm font-semibold text-slate-300 mb-1">Mercado vs Modelo</h3>
+        <p id="compareNote" class="text-xs text-slate-500 mb-3"></p>
+        <div id="compare" class="text-sm"></div>
+      </div>
+    </section>
+
+    <footer class="mt-12 text-center text-[11px] text-slate-600">
+      Predicción estadística orientativa. No constituye consejo de apuestas.
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
