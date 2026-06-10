@@ -222,7 +222,8 @@ async function runTournament() {
     if (!res.ok) throw new Error("Error en la simulación del torneo.");
     const d = await res.json();
 
-    $("#tInfo").textContent = `${fmtInt(d.n_simulations)} torneos simulados`;
+    $("#tInfo").textContent =
+      `${fmtInt(d.n_simulations)} torneos · ${d.official_groups ? "grupos oficiales" : "grupos auto"}`;
     const max = d.ranking[0].champion || 1;
     $("#tBody").innerHTML = d.ranking
       .map((r, i) => {

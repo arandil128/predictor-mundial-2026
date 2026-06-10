@@ -8,8 +8,14 @@ from app.model.poisson import (
     outcome_probs,
     score_matrix,
 )
-from app.model.tournament import default_groups, simulate_tournament
+from app.model.tournament import (
+    default_groups,
+    official_groups,
+    resolve_groups,
+    simulate_tournament,
+)
 from app.services.odds import implied_no_vig
+from app.services.ratings import get_rating
 
 
 def test_implied_no_vig_sums_to_one():
@@ -64,6 +70,24 @@ def test_default_groups_structure():
     assert all(len(teams) == 4 for teams in groups.values())
     flat = [t for teams in groups.values() for t in teams]
     assert len(set(flat)) == 48  # 48 equipos únicos
+
+
+def test_official_groups_valid_and_known():
+    groups = official_groups()
+    assert groups is not None, "Debe existir data/groups_2026.json válido"
+    assert len(groups) == 12
+    flat = [t for teams in groups.values() for t in teams]
+    assert len(flat) == 48
+    assert len(set(flat)) == 48  # sin equipos repetidos
+    # Cada selección debe tener rating Elo conocido (no caer al default).
+    missing = [t for t in flat if get_rating(t) is None]
+    assert not missing, f"Equipos sin rating en el dataset: {missing}"
+
+
+def test_resolve_groups_prefers_official():
+    groups, official = resolve_groups()
+    assert official is True
+    assert len(groups) == 12
 
 
 def test_tournament_probabilities_consistent():

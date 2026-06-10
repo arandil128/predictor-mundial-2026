@@ -10,15 +10,38 @@ torneo se juegan en sede neutral, así que no se aplica ventaja de localía.
 """
 from __future__ import annotations
 
+import json
+
 import numpy as np
 
+from app.config import DATA_DIR
 from app.model.poisson import lambdas_from_elo
-from app.services.ratings import all_teams, elo_of
+from app.services.ratings import all_teams, elo_of, get_rating
 
 BASE_LAMBDA = 1.35
 GROUP_LETTERS = [chr(ord("A") + i) for i in range(12)]
 # Etiquetas de las rondas alcanzadas (de menor a mayor).
 STAGES = ["r32", "r16", "qf", "sf", "final", "champion"]
+
+
+OFFICIAL_GROUPS_PATH = DATA_DIR / "groups_2026.json"
+
+
+def official_groups() -> dict[str, list[str]] | None:
+    """Grupos oficiales del Mundial 2026 desde data/groups_2026.json.
+
+    Devuelve None si el archivo no existe o no es válido (12 grupos de 4).
+    """
+    if not OFFICIAL_GROUPS_PATH.exists():
+        return None
+    try:
+        data = json.loads(OFFICIAL_GROUPS_PATH.read_text(encoding="utf-8"))
+        groups = data["groups"]
+    except (json.JSONDecodeError, KeyError, OSError):
+        return None
+    if len(groups) != 12 or any(len(t) != 4 for t in groups.values()):
+        return None
+    return groups
 
 
 def default_groups() -> dict[str, list[str]]:
@@ -36,6 +59,14 @@ def default_groups() -> dict[str, list[str]]:
             groups[g].append(teams[idx])
             idx += 1
     return groups
+
+
+def resolve_groups() -> tuple[dict[str, list[str]], bool]:
+    """Devuelve (grupos, son_oficiales). Usa los oficiales si están disponibles."""
+    official = official_groups()
+    if official is not None:
+        return official, True
+    return default_groups(), False
 
 
 class _Engine:

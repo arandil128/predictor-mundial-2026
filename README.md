@@ -17,7 +17,7 @@
 ## ✨ Características
 
 - 🎯 **Predicción por partido**: probabilidades 1X2, marcador esperado, marcadores más probables, Over 2.5 y Ambos Marcan.
-- 🏆 **Simulación del torneo completo**: 48 equipos en 12 grupos, clasificación (1°, 2° + 8 mejores 3°) y eliminatoria hasta el campeón. Probabilidad de campeón, final, semis y clasificación por equipo.
+- 🏆 **Simulación del torneo completo**: con los **grupos oficiales del sorteo** (48 equipos en 12 grupos), clasificación (1°, 2° + 8 mejores 3°) y eliminatoria hasta el campeón. Probabilidad de campeón, final, semis y clasificación por equipo. Los grupos viven en `data/groups_2026.json` (editable).
 - 🎲 **Monte Carlo configurable**: vos elegís cuántas simulaciones correr. Más simulaciones ⇒ estimaciones más estables.
 - 📊 **Datos en vivo**: consulta cuotas y ratings en el momento de simular (con caché corta para respetar los límites de las APIs gratuitas).
 - ↻ **Refresco de Elo a requerimiento**: un botón descarga los ratings actuales desde una fuente abierta (gratis, sin clave) — sin polling automático, no gasta tus APIs.
@@ -129,6 +129,7 @@ app/
     tournament.py      simulación del Mundial completo (grupos + eliminatoria)
     blend.py           mezcla mercado ↔ modelo
 data/elo_ratings.csv   ratings semilla / fallback
+data/groups_2026.json  grupos oficiales del sorteo (editable)
 static/                index.html + app.js (UI)
 tests/                 sanidad del modelo
 Dockerfile             imagen para EasyPanel / Docker
@@ -150,7 +151,8 @@ render.yaml            blueprint para Render
 
 - [x] Refresco de Elo **a requerimiento** (fuente abierta, sin gastar APIs).
 - [x] Simulación del **torneo completo** (grupos → llaves → campeón probable).
-- [ ] Grupos editables / carga del sorteo oficial cuando se realice.
+- [x] **Grupos oficiales del sorteo** cargados desde `data/groups_2026.json` (editable).
+- [ ] Mapeo exacto del cuadro de eliminatoria según las posiciones FIFA.
 - [ ] Historial de predicciones y comparación contra resultados reales.
 
 ---

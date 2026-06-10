@@ -108,8 +108,10 @@ def api_simulate_tournament(req: TournamentRequest) -> dict:
     Endpoint sync a propósito: es CPU-bound y FastAPI lo corre en un threadpool
     para no bloquear el event loop. Usa los Elo vigentes (incluye refrescos).
     """
-    groups = tournament_mod.default_groups()
-    return tournament_mod.simulate_tournament(groups, req.n_simulations)
+    groups, official = tournament_mod.resolve_groups()
+    result = tournament_mod.simulate_tournament(groups, req.n_simulations)
+    result["official_groups"] = official
+    return result
 
 
 @app.get("/")
