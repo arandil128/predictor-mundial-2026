@@ -17,10 +17,12 @@
 ## ✨ Características
 
 - 🎯 **Predicción por partido**: probabilidades 1X2, marcador esperado, marcadores más probables, Over 2.5 y Ambos Marcan.
-- 🎲 **Monte Carlo configurable**: vos elegís cuántas simulaciones correr (1.000 – 200.000). Más simulaciones ⇒ estimaciones más estables.
+- 🏆 **Simulación del torneo completo**: 48 equipos en 12 grupos, clasificación (1°, 2° + 8 mejores 3°) y eliminatoria hasta el campeón. Probabilidad de campeón, final, semis y clasificación por equipo.
+- 🎲 **Monte Carlo configurable**: vos elegís cuántas simulaciones correr. Más simulaciones ⇒ estimaciones más estables.
 - 📊 **Datos en vivo**: consulta cuotas y ratings en el momento de simular (con caché corta para respetar los límites de las APIs gratuitas).
+- ↻ **Refresco de Elo a requerimiento**: un botón descarga los ratings actuales desde una fuente abierta (gratis, sin clave) — sin polling automático, no gasta tus APIs.
 - 🧮 **Modelo híbrido**: el mercado de apuestas como ancla + modelo Elo/FIFA, mezclados con un peso configurable.
-- 🎨 **UI minimalista**: una sola pantalla, responsive, sin pasos de más.
+- 🎨 **UI minimalista**: una sola pantalla con pestañas Partido / Torneo, responsive.
 - 🔌 **Funciona sin claves**: arranca con un dataset Elo semilla y suma las cuotas cuando configurás las APIs.
 
 ---
@@ -123,7 +125,8 @@ app/
     cache.py           caché en memoria con TTL
   model/
     poisson.py         λ desde Elo, matriz Dixon-Coles, calibración al mercado
-    montecarlo.py      motor de N simulaciones
+    montecarlo.py      motor de N simulaciones (partido)
+    tournament.py      simulación del Mundial completo (grupos + eliminatoria)
     blend.py           mezcla mercado ↔ modelo
 data/elo_ratings.csv   ratings semilla / fallback
 static/                index.html + app.js (UI)
@@ -134,10 +137,20 @@ render.yaml            blueprint para Render
 
 ---
 
+## 🔌 Endpoints
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/matches` | Equipos disponibles, fixtures y estado de fuentes. |
+| `POST` | `/api/simulate` | Predicción de un partido (`home_team`, `away_team`, `n_simulations`). |
+| `POST` | `/api/simulate-tournament` | Simula el Mundial completo (`n_simulations`). |
+| `POST` | `/api/refresh-ratings` | Actualiza los Elo en vivo (a requerimiento). |
+
 ## 🗺️ Roadmap
 
-- [ ] Dataset Elo **auto-actualizable** (refresco periódico desde fuente en vivo).
-- [ ] Simulación del **torneo completo** (grupos → llaves → campeón probable).
+- [x] Refresco de Elo **a requerimiento** (fuente abierta, sin gastar APIs).
+- [x] Simulación del **torneo completo** (grupos → llaves → campeón probable).
+- [ ] Grupos editables / carga del sorteo oficial cuando se realice.
 - [ ] Historial de predicciones y comparación contra resultados reales.
 
 ---

@@ -8,6 +8,7 @@ from app.model.poisson import (
     outcome_probs,
     score_matrix,
 )
+from app.model.tournament import default_groups, simulate_tournament
 from app.services.odds import implied_no_vig
 
 
@@ -55,3 +56,25 @@ def test_simulation_probs_are_valid():
     assert 0 <= sim.over_2_5 <= 1
     assert len(sim.top_scorelines) == 5
     assert abs(sum(d["prob"] for d in sim.total_goals_dist) - 1.0) < 1e-9
+
+
+def test_default_groups_structure():
+    groups = default_groups()
+    assert len(groups) == 12
+    assert all(len(teams) == 4 for teams in groups.values())
+    flat = [t for teams in groups.values() for t in teams]
+    assert len(set(flat)) == 48  # 48 equipos únicos
+
+
+def test_tournament_probabilities_consistent():
+    res = simulate_tournament(default_groups(), n=400, seed=7)
+    ranking = res["ranking"]
+    # P(campeón) suma ~1 y 32 equipos clasifican en promedio.
+    assert abs(sum(r["champion"] for r in ranking) - 1.0) < 1e-9
+    assert abs(sum(r["r32"] for r in ranking) - 32.0) < 1e-9
+    # Rondas monótonas decrecientes para cada equipo.
+    for r in ranking:
+        assert r["r32"] >= r["r16"] >= r["qf"] >= r["sf"] >= r["final"] >= r["champion"]
+    # El ranking viene ordenado por probabilidad de campeón.
+    champs = [r["champion"] for r in ranking]
+    assert champs == sorted(champs, reverse=True)

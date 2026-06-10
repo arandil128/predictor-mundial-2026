@@ -194,6 +194,85 @@ async function run() {
 $("#sims").addEventListener("input", (e) => {
   $("#simsLabel").textContent = (+e.target.value).toLocaleString("es-AR");
 });
+// ---------------- Pestañas ----------------
+function setTab(name) {
+  document.querySelectorAll(".tab").forEach((b) =>
+    b.classList.toggle("tab-active", b.dataset.tab === name)
+  );
+  $("#pane-match").classList.toggle("hidden", name !== "match");
+  $("#pane-tournament").classList.toggle("hidden", name !== "tournament");
+}
+document.querySelectorAll(".tab").forEach((b) =>
+  b.addEventListener("click", () => setTab(b.dataset.tab))
+);
+
+// ---------------- Torneo completo ----------------
+async function runTournament() {
+  const btn = $("#runT");
+  btn.disabled = true;
+  btn.textContent = "Simulando torneo…";
+  $("#tStatus").textContent =
+    "Jugando miles de Mundiales… (cada simulación juega 103 partidos)";
+  try {
+    const res = await fetch("/api/simulate-tournament", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ n_simulations: +$("#tSims").value }),
+    });
+    if (!res.ok) throw new Error("Error en la simulación del torneo.");
+    const d = await res.json();
+
+    $("#tInfo").textContent = `${fmtInt(d.n_simulations)} torneos simulados`;
+    const max = d.ranking[0].champion || 1;
+    $("#tBody").innerHTML = d.ranking
+      .map((r, i) => {
+        const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1;
+        return `
+        <tr class="border-b border-slate-800/60">
+          <td class="py-2 pr-2 text-slate-500">${medal}</td>
+          <td class="py-2 pr-2 font-medium">${r.team}<span class="text-slate-600 text-xs ml-1">${r.elo}</span></td>
+          <td class="py-2 pr-2">
+            <div class="flex items-center gap-2 justify-end">
+              <div class="hidden sm:block h-1.5 w-20 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full bg-emerald-500" style="width:${((r.champion / max) * 100).toFixed(1)}%"></div>
+              </div>
+              <span class="tabular-nums font-semibold w-12 text-right">${fmtPct(r.champion)}</span>
+            </div>
+          </td>
+          <td class="py-2 pr-2 text-right tabular-nums text-slate-400 hidden sm:table-cell">${fmtPct(r.final)}</td>
+          <td class="py-2 pr-2 text-right tabular-nums text-slate-400 hidden sm:table-cell">${fmtPct(r.sf)}</td>
+          <td class="py-2 text-right tabular-nums text-slate-400">${fmtPct(r.r32)}</td>
+        </tr>`;
+      })
+      .join("");
+
+    $("#tGroups").innerHTML = Object.entries(d.groups)
+      .map(
+        ([g, teams]) => `
+        <div class="rounded-lg bg-slate-800/40 p-2">
+          <div class="font-semibold text-slate-300 mb-1">Grupo ${g}</div>
+          ${teams.map((t) => `<div class="text-slate-400">${t}</div>`).join("")}
+        </div>`
+      )
+      .join("");
+
+    $("#tResults").classList.remove("hidden");
+    $("#tStatus").textContent = "";
+    $("#tResults").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (e) {
+    $("#tStatus").textContent = e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Simular torneo";
+  }
+}
+
+$("#tSims").addEventListener("input", (e) => {
+  $("#tSimsLabel").textContent = (+e.target.value).toLocaleString("es-AR");
+});
+$("#runT").addEventListener("click", runTournament);
+
 $("#run").addEventListener("click", run);
 $("#refreshElo").addEventListener("click", refreshElo);
+setTab("match");
 loadTeams();

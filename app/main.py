@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from app.config import STATIC_DIR, get_settings
 from app.model import blend as blend_mod
+from app.model import tournament as tournament_mod
 from app.model.montecarlo import simulate
 from app.services import fixtures, ratings
 from app.services.odds import get_market_probs
@@ -20,6 +21,10 @@ class SimulateRequest(BaseModel):
     home_team: str = Field(..., min_length=1)
     away_team: str = Field(..., min_length=1)
     n_simulations: int = Field(10_000, ge=1_000, le=200_000)
+
+
+class TournamentRequest(BaseModel):
+    n_simulations: int = Field(2_000, ge=200, le=20_000)
 
 
 @app.get("/api/matches")
@@ -94,6 +99,17 @@ async def api_simulate(req: SimulateRequest) -> dict:
         },
         "has_market": market is not None,
     }
+
+
+@app.post("/api/simulate-tournament")
+def api_simulate_tournament(req: TournamentRequest) -> dict:
+    """Simula el Mundial completo N veces y devuelve probabilidades por equipo.
+
+    Endpoint sync a propósito: es CPU-bound y FastAPI lo corre en un threadpool
+    para no bloquear el event loop. Usa los Elo vigentes (incluye refrescos).
+    """
+    groups = tournament_mod.default_groups()
+    return tournament_mod.simulate_tournament(groups, req.n_simulations)
 
 
 @app.get("/")
