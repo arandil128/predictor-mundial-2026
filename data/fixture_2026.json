@@ -1,0 +1,1951 @@
+{
+  "_comment": "Generado por scripts/build_fixture.py desde el calendario provisto (hora de Argentina).",
+  "timezone": "America/Argentina/Buenos_Aires",
+  "matches": [
+    {
+      "n": 1,
+      "stage": "group",
+      "group": "A",
+      "home": "Mexico",
+      "away": "South Africa",
+      "date": "2026-06-11",
+      "time": "16:00",
+      "venue": "Estadio Azteca, Ciudad de México",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 2,
+      "stage": "group",
+      "group": "A",
+      "home": "South Korea",
+      "away": "Czechia",
+      "date": "2026-06-11",
+      "time": "23:00",
+      "venue": "Estadio Akron, Guadalajara",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 3,
+      "stage": "group",
+      "group": "A",
+      "home": "Czechia",
+      "away": "South Africa",
+      "date": "2026-06-18",
+      "time": "13:00",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 4,
+      "stage": "group",
+      "group": "A",
+      "home": "Mexico",
+      "away": "South Korea",
+      "date": "2026-06-18",
+      "time": "22:00",
+      "venue": "Estadio Akron, Guadalajara",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 5,
+      "stage": "group",
+      "group": "A",
+      "home": "Czechia",
+      "away": "Mexico",
+      "date": "2026-06-24",
+      "time": "22:00",
+      "venue": "Estadio Azteca, Ciudad de México",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 6,
+      "stage": "group",
+      "group": "A",
+      "home": "South Africa",
+      "away": "South Korea",
+      "date": "2026-06-24",
+      "time": "22:00",
+      "venue": "Estadio BBVA, Monterrey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 7,
+      "stage": "group",
+      "group": "B",
+      "home": "Canada",
+      "away": "Bosnia and Herzegovina",
+      "date": "2026-06-12",
+      "time": "16:00",
+      "venue": "BMO Field, Toronto",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 8,
+      "stage": "group",
+      "group": "B",
+      "home": "Qatar",
+      "away": "Switzerland",
+      "date": "2026-06-13",
+      "time": "16:00",
+      "venue": "Levi's Stadium, San Francisco Bay Area",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 9,
+      "stage": "group",
+      "group": "B",
+      "home": "Switzerland",
+      "away": "Bosnia and Herzegovina",
+      "date": "2026-06-18",
+      "time": "16:00",
+      "venue": "SoFi Stadium, Los Ángeles",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 10,
+      "stage": "group",
+      "group": "B",
+      "home": "Canada",
+      "away": "Qatar",
+      "date": "2026-06-18",
+      "time": "19:00",
+      "venue": "BC Place, Vancouver",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 11,
+      "stage": "group",
+      "group": "B",
+      "home": "Switzerland",
+      "away": "Canada",
+      "date": "2026-06-24",
+      "time": "16:00",
+      "venue": "BC Place, Vancouver",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 12,
+      "stage": "group",
+      "group": "B",
+      "home": "Bosnia and Herzegovina",
+      "away": "Qatar",
+      "date": "2026-06-24",
+      "time": "16:00",
+      "venue": "Lumen Field, Seattle",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 13,
+      "stage": "group",
+      "group": "C",
+      "home": "Brazil",
+      "away": "Morocco",
+      "date": "2026-06-13",
+      "time": "19:00",
+      "venue": "MetLife Stadium, Nueva York/Nueva Jersey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 14,
+      "stage": "group",
+      "group": "C",
+      "home": "Haiti",
+      "away": "Scotland",
+      "date": "2026-06-13",
+      "time": "22:00",
+      "venue": "Gillette Stadium, Boston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 15,
+      "stage": "group",
+      "group": "C",
+      "home": "Scotland",
+      "away": "Morocco",
+      "date": "2026-06-19",
+      "time": "19:00",
+      "venue": "Gillette Stadium, Boston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 16,
+      "stage": "group",
+      "group": "C",
+      "home": "Brazil",
+      "away": "Haiti",
+      "date": "2026-06-19",
+      "time": "22:00",
+      "venue": "Lincoln Financial Field, Filadelfia",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 17,
+      "stage": "group",
+      "group": "C",
+      "home": "Scotland",
+      "away": "Brazil",
+      "date": "2026-06-24",
+      "time": "19:00",
+      "venue": "Hard Rock Stadium, Miami",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 18,
+      "stage": "group",
+      "group": "C",
+      "home": "Morocco",
+      "away": "Haiti",
+      "date": "2026-06-24",
+      "time": "19:00",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 19,
+      "stage": "group",
+      "group": "D",
+      "home": "United States",
+      "away": "Paraguay",
+      "date": "2026-06-12",
+      "time": "22:00",
+      "venue": "SoFi Stadium, Los Ángeles",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 20,
+      "stage": "group",
+      "group": "D",
+      "home": "Australia",
+      "away": "Turkey",
+      "date": "2026-06-14",
+      "time": "01:00",
+      "venue": "BC Place, Vancouver",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 21,
+      "stage": "group",
+      "group": "D",
+      "home": "Turkey",
+      "away": "Paraguay",
+      "date": "2026-06-20",
+      "time": "01:00",
+      "venue": "Levi's Stadium, San Francisco Bay Area",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 22,
+      "stage": "group",
+      "group": "D",
+      "home": "United States",
+      "away": "Australia",
+      "date": "2026-06-19",
+      "time": "16:00",
+      "venue": "Lumen Field, Seattle",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 23,
+      "stage": "group",
+      "group": "D",
+      "home": "Turkey",
+      "away": "United States",
+      "date": "2026-06-25",
+      "time": "23:00",
+      "venue": "SoFi Stadium, Los Ángeles",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 24,
+      "stage": "group",
+      "group": "D",
+      "home": "Paraguay",
+      "away": "Australia",
+      "date": "2026-06-25",
+      "time": "23:00",
+      "venue": "Levi's Stadium, San Francisco Bay Area",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 25,
+      "stage": "group",
+      "group": "E",
+      "home": "Germany",
+      "away": "Curacao",
+      "date": "2026-06-14",
+      "time": "14:00",
+      "venue": "NRG Stadium, Houston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 26,
+      "stage": "group",
+      "group": "E",
+      "home": "Ivory Coast",
+      "away": "Ecuador",
+      "date": "2026-06-14",
+      "time": "20:00",
+      "venue": "Lincoln Financial Field, Filadelfia",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 27,
+      "stage": "group",
+      "group": "E",
+      "home": "Germany",
+      "away": "Ivory Coast",
+      "date": "2026-06-20",
+      "time": "17:00",
+      "venue": "BMO Field, Toronto",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 28,
+      "stage": "group",
+      "group": "E",
+      "home": "Ecuador",
+      "away": "Curacao",
+      "date": "2026-06-20",
+      "time": "21:00",
+      "venue": "Arrowhead Stadium, Kansas City",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 29,
+      "stage": "group",
+      "group": "E",
+      "home": "Ecuador",
+      "away": "Germany",
+      "date": "2026-06-25",
+      "time": "17:00",
+      "venue": "MetLife Stadium, Nueva York/Nueva Jersey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 30,
+      "stage": "group",
+      "group": "E",
+      "home": "Curacao",
+      "away": "Ivory Coast",
+      "date": "2026-06-25",
+      "time": "17:00",
+      "venue": "Lincoln Financial Field, Filadelfia",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 31,
+      "stage": "group",
+      "group": "F",
+      "home": "Netherlands",
+      "away": "Japan",
+      "date": "2026-06-14",
+      "time": "17:00",
+      "venue": "AT&T Stadium, Dallas",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 32,
+      "stage": "group",
+      "group": "F",
+      "home": "Sweden",
+      "away": "Tunisia",
+      "date": "2026-06-14",
+      "time": "23:00",
+      "venue": "Estadio BBVA, Monterrey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 33,
+      "stage": "group",
+      "group": "F",
+      "home": "Netherlands",
+      "away": "Sweden",
+      "date": "2026-06-20",
+      "time": "14:00",
+      "venue": "NRG Stadium, Houston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 34,
+      "stage": "group",
+      "group": "F",
+      "home": "Tunisia",
+      "away": "Japan",
+      "date": "2026-06-21",
+      "time": "01:00",
+      "venue": "Levi's Stadium, San Francisco Bay Area",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 35,
+      "stage": "group",
+      "group": "F",
+      "home": "Japan",
+      "away": "Sweden",
+      "date": "2026-06-25",
+      "time": "20:00",
+      "venue": "AT&T Stadium, Dallas",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 36,
+      "stage": "group",
+      "group": "F",
+      "home": "Tunisia",
+      "away": "Netherlands",
+      "date": "2026-06-25",
+      "time": "20:00",
+      "venue": "Arrowhead Stadium, Kansas City",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 37,
+      "stage": "group",
+      "group": "G",
+      "home": "Iran",
+      "away": "New Zealand",
+      "date": "2026-06-15",
+      "time": "22:00",
+      "venue": "SoFi Stadium, Los Ángeles",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 38,
+      "stage": "group",
+      "group": "G",
+      "home": "Belgium",
+      "away": "Egypt",
+      "date": "2026-06-15",
+      "time": "16:00",
+      "venue": "Lumen Field, Seattle",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 39,
+      "stage": "group",
+      "group": "G",
+      "home": "Belgium",
+      "away": "Iran",
+      "date": "2026-06-21",
+      "time": "16:00",
+      "venue": "SoFi Stadium, Los Ángeles",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 40,
+      "stage": "group",
+      "group": "G",
+      "home": "New Zealand",
+      "away": "Egypt",
+      "date": "2026-06-21",
+      "time": "22:00",
+      "venue": "BC Place, Vancouver",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 41,
+      "stage": "group",
+      "group": "G",
+      "home": "Egypt",
+      "away": "Iran",
+      "date": "2026-06-27",
+      "time": "00:00",
+      "venue": "Lumen Field, Seattle",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 42,
+      "stage": "group",
+      "group": "G",
+      "home": "New Zealand",
+      "away": "Belgium",
+      "date": "2026-06-27",
+      "time": "00:00",
+      "venue": "BC Place, Vancouver",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 43,
+      "stage": "group",
+      "group": "H",
+      "home": "Spain",
+      "away": "Cape Verde",
+      "date": "2026-06-15",
+      "time": "13:00",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 44,
+      "stage": "group",
+      "group": "H",
+      "home": "Saudi Arabia",
+      "away": "Uruguay",
+      "date": "2026-06-15",
+      "time": "19:00",
+      "venue": "Hard Rock Stadium, Miami",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 45,
+      "stage": "group",
+      "group": "H",
+      "home": "Spain",
+      "away": "Saudi Arabia",
+      "date": "2026-06-21",
+      "time": "13:00",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 46,
+      "stage": "group",
+      "group": "H",
+      "home": "Uruguay",
+      "away": "Cape Verde",
+      "date": "2026-06-21",
+      "time": "19:00",
+      "venue": "Hard Rock Stadium, Miami",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 47,
+      "stage": "group",
+      "group": "H",
+      "home": "Cape Verde",
+      "away": "Saudi Arabia",
+      "date": "2026-06-26",
+      "time": "21:00",
+      "venue": "NRG Stadium, Houston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 48,
+      "stage": "group",
+      "group": "H",
+      "home": "Uruguay",
+      "away": "Spain",
+      "date": "2026-06-26",
+      "time": "21:00",
+      "venue": "Estadio Akron, Guadalajara",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 49,
+      "stage": "group",
+      "group": "I",
+      "home": "France",
+      "away": "Senegal",
+      "date": "2026-06-16",
+      "time": "16:00",
+      "venue": "MetLife Stadium, Nueva York/Nueva Jersey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 50,
+      "stage": "group",
+      "group": "I",
+      "home": "Iraq",
+      "away": "Norway",
+      "date": "2026-06-16",
+      "time": "19:00",
+      "venue": "Gillette Stadium, Boston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 51,
+      "stage": "group",
+      "group": "I",
+      "home": "France",
+      "away": "Iraq",
+      "date": "2026-06-22",
+      "time": "18:00",
+      "venue": "Lincoln Financial Field, Filadelfia",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 52,
+      "stage": "group",
+      "group": "I",
+      "home": "Norway",
+      "away": "Senegal",
+      "date": "2026-06-22",
+      "time": "21:00",
+      "venue": "MetLife Stadium, Nueva York/Nueva Jersey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 53,
+      "stage": "group",
+      "group": "I",
+      "home": "Norway",
+      "away": "France",
+      "date": "2026-06-26",
+      "time": "16:00",
+      "venue": "Gillette Stadium, Boston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 54,
+      "stage": "group",
+      "group": "I",
+      "home": "Senegal",
+      "away": "Iraq",
+      "date": "2026-06-26",
+      "time": "16:00",
+      "venue": "BMO Field, Toronto",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 55,
+      "stage": "group",
+      "group": "J",
+      "home": "Argentina",
+      "away": "Algeria",
+      "date": "2026-06-16",
+      "time": "22:00",
+      "venue": "Arrowhead Stadium, Kansas City",
+      "tv": [
+        "TV Pública",
+        "Telefe",
+        "TyC Sports",
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 56,
+      "stage": "group",
+      "group": "J",
+      "home": "Austria",
+      "away": "Jordan",
+      "date": "2026-06-17",
+      "time": "01:00",
+      "venue": "Levi's Stadium, San Francisco Bay Area",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 57,
+      "stage": "group",
+      "group": "J",
+      "home": "Argentina",
+      "away": "Austria",
+      "date": "2026-06-22",
+      "time": "14:00",
+      "venue": "AT&T Stadium, Dallas",
+      "tv": [
+        "TV Pública",
+        "Telefe",
+        "TyC Sports",
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 58,
+      "stage": "group",
+      "group": "J",
+      "home": "Jordan",
+      "away": "Algeria",
+      "date": "2026-06-23",
+      "time": "00:00",
+      "venue": "Levi's Stadium, San Francisco Bay Area",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 59,
+      "stage": "group",
+      "group": "J",
+      "home": "Algeria",
+      "away": "Austria",
+      "date": "2026-06-27",
+      "time": "23:00",
+      "venue": "Arrowhead Stadium, Kansas City",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 60,
+      "stage": "group",
+      "group": "J",
+      "home": "Jordan",
+      "away": "Argentina",
+      "date": "2026-06-27",
+      "time": "23:00",
+      "venue": "AT&T Stadium, Dallas",
+      "tv": [
+        "TV Pública",
+        "Telefe",
+        "TyC Sports",
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 61,
+      "stage": "group",
+      "group": "K",
+      "home": "Portugal",
+      "away": "DR Congo",
+      "date": "2026-06-17",
+      "time": "14:00",
+      "venue": "NRG Stadium, Houston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 62,
+      "stage": "group",
+      "group": "K",
+      "home": "Uzbekistan",
+      "away": "Colombia",
+      "date": "2026-06-17",
+      "time": "23:00",
+      "venue": "Estadio Azteca, Ciudad de México",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 63,
+      "stage": "group",
+      "group": "K",
+      "home": "Portugal",
+      "away": "Uzbekistan",
+      "date": "2026-06-23",
+      "time": "14:00",
+      "venue": "NRG Stadium, Houston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 64,
+      "stage": "group",
+      "group": "K",
+      "home": "Colombia",
+      "away": "DR Congo",
+      "date": "2026-06-23",
+      "time": "23:00",
+      "venue": "Estadio Akron, Guadalajara",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 65,
+      "stage": "group",
+      "group": "K",
+      "home": "Colombia",
+      "away": "Portugal",
+      "date": "2026-06-27",
+      "time": "20:30",
+      "venue": "Hard Rock Stadium, Miami",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 66,
+      "stage": "group",
+      "group": "K",
+      "home": "DR Congo",
+      "away": "Uzbekistan",
+      "date": "2026-06-27",
+      "time": "20:30",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 67,
+      "stage": "group",
+      "group": "L",
+      "home": "England",
+      "away": "Croatia",
+      "date": "2026-06-17",
+      "time": "17:00",
+      "venue": "AT&T Stadium, Dallas",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 68,
+      "stage": "group",
+      "group": "L",
+      "home": "Ghana",
+      "away": "Panama",
+      "date": "2026-06-17",
+      "time": "20:00",
+      "venue": "BMO Field, Toronto",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 69,
+      "stage": "group",
+      "group": "L",
+      "home": "England",
+      "away": "Ghana",
+      "date": "2026-06-23",
+      "time": "17:00",
+      "venue": "Gillette Stadium, Boston",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 70,
+      "stage": "group",
+      "group": "L",
+      "home": "Panama",
+      "away": "Croatia",
+      "date": "2026-06-23",
+      "time": "20:00",
+      "venue": "BMO Field, Toronto",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 71,
+      "stage": "group",
+      "group": "L",
+      "home": "Panama",
+      "away": "England",
+      "date": "2026-06-27",
+      "time": "18:00",
+      "venue": "MetLife Stadium, Nueva York/Nueva Jersey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 72,
+      "stage": "group",
+      "group": "L",
+      "home": "Croatia",
+      "away": "Ghana",
+      "date": "2026-06-27",
+      "time": "18:00",
+      "venue": "Lincoln Financial Field, Filadelfia",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 73,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "2° A",
+      "away_label": "2° B",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 74,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° E",
+      "away_label": "3° (A/B/C/D/F)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 75,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° F",
+      "away_label": "2° C",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 76,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° C",
+      "away_label": "2° F",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 77,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° I",
+      "away_label": "3° (C/D/F/G/H)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 78,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "2° E",
+      "away_label": "2° I",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 79,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° A",
+      "away_label": "3° (C/E/F/H/I)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 80,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° L",
+      "away_label": "3° (E/H/I/J/K)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 81,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° D",
+      "away_label": "3° (B/E/F/I/J)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 82,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° G",
+      "away_label": "3° (A/E/H/I/J)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 83,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "2° K",
+      "away_label": "2° L",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 84,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° H",
+      "away_label": "2° J",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 85,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° B",
+      "away_label": "3° (E/F/G/I/J)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 86,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° J",
+      "away_label": "2° H",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 87,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "1° K",
+      "away_label": "3° (D/E/I/J/L)",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 88,
+      "stage": "r32",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "2° D",
+      "away_label": "2° G",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 89,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 74",
+      "away_label": "Ganador 77",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 90,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 73",
+      "away_label": "Ganador 75",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 91,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 76",
+      "away_label": "Ganador 78",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 92,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 79",
+      "away_label": "Ganador 80",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 93,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 83",
+      "away_label": "Ganador 84",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 94,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 81",
+      "away_label": "Ganador 82",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 95,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 86",
+      "away_label": "Ganador 88",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 96,
+      "stage": "r16",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 85",
+      "away_label": "Ganador 87",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 97,
+      "stage": "qf",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 89",
+      "away_label": "Ganador 90",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 98,
+      "stage": "qf",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 93",
+      "away_label": "Ganador 94",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 99,
+      "stage": "qf",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 91",
+      "away_label": "Ganador 92",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 100,
+      "stage": "qf",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 95",
+      "away_label": "Ganador 96",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 101,
+      "stage": "sf",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 97",
+      "away_label": "Ganador 98",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 102,
+      "stage": "sf",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 99",
+      "away_label": "Ganador 100",
+      "date": null,
+      "time": null,
+      "venue": null,
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 103,
+      "stage": "third",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Perdedor 101",
+      "away_label": "Perdedor 102",
+      "date": "2026-07-18",
+      "time": null,
+      "venue": "Hard Rock Stadium, Miami",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    },
+    {
+      "n": 104,
+      "stage": "final",
+      "group": null,
+      "home": null,
+      "away": null,
+      "home_label": "Ganador 101",
+      "away_label": "Ganador 102",
+      "date": "2026-07-19",
+      "time": null,
+      "venue": "MetLife Stadium, Nueva York/Nueva Jersey",
+      "tv": [
+        "Disney+",
+        "DSports",
+        "DGO",
+        "Flow",
+        "Paramount+",
+        "Prime Video"
+      ]
+    }
+  ]
+}

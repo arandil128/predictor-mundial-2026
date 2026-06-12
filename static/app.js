@@ -272,8 +272,17 @@ function matchCard(m) {
     when ? `${when}${m.time ? " · " + m.time : ""}` : "Fecha a confirmar",
     m.venue || null,
   ].filter(Boolean);
+  const ABIERTA = ["TV Pública", "Telefe", "TyC Sports"];
   const tv = (m.tv || []).length
-    ? m.tv.map((t) => `<span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300">📺 ${t}</span>`).join(" ")
+    ? m.tv
+        .map((t) => {
+          const free = ABIERTA.includes(t);
+          const cls = free
+            ? "bg-emerald-500/15 text-emerald-300 border border-emerald-600/40"
+            : "bg-slate-800 text-slate-300";
+          return `<span class="rounded ${cls} px-1.5 py-0.5 text-[10px]">${free ? "📡" : "📺"} ${t}</span>`;
+        })
+        .join(" ")
     : `<span class="text-[10px] text-slate-600">TV a confirmar</span>`;
 
   const badge = m.group ? `Grupo ${m.group}` : STAGE_LABELS[m.stage] || m.stage_es;
