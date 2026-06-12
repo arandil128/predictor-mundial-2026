@@ -62,6 +62,30 @@ def _load() -> dict[str, TeamRating]:
     return table
 
 
+@lru_cache
+def _names_es() -> dict[str, str]:
+    """Mapa nombre-en-inglés -> nombre-en-español desde data/teams_es.json."""
+    path = DATA_DIR / "teams_es.json"
+    if not path.exists():
+        return {}
+    import json
+
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get("names", {})
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def name_es(name: str) -> str:
+    """Nombre en español de una selección (cae al nombre original si no está)."""
+    return _names_es().get(name, name)
+
+
+def names_es_map() -> dict[str, str]:
+    """Mapa completo inglés->español para que el frontend traduzca."""
+    return dict(_names_es())
+
+
 def all_teams() -> list[TeamRating]:
     """Lista de selecciones únicas ordenadas por ranking FIFA."""
     seen: dict[str, TeamRating] = {}

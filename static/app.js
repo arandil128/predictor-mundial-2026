@@ -3,16 +3,22 @@ const fmtPct = (p) => (p * 100).toFixed(1) + "%";
 const fmtInt = (n) => n.toLocaleString("es-AR");
 
 let goalsChart = null;
+let ES = {}; // mapa inglés -> español
+const es = (t) => ES[t] || t; // traduce un nombre de selección
 
 async function loadTeams() {
   const res = await fetch("/api/matches");
   const data = await res.json();
+  ES = data.names_es || {};
   const home = $("#home");
   const away = $("#away");
-  data.teams.forEach((t) => {
-    home.add(new Option(`${t.team}`, t.team));
-    away.add(new Option(`${t.team}`, t.team));
-  });
+  data.teams
+    .slice()
+    .sort((a, b) => es(a.team).localeCompare(es(b.team), "es"))
+    .forEach((t) => {
+      home.add(new Option(es(t.team), t.team));
+      away.add(new Option(es(t.team), t.team));
+    });
   // Defaults distintos para arrancar.
   home.selectedIndex = 0;
   away.selectedIndex = Math.min(1, data.teams.length - 1);
@@ -148,13 +154,13 @@ async function run() {
     }
     const d = await res.json();
 
-    $("#matchTitle").textContent = `${d.home_team} vs ${d.away_team}`;
+    $("#matchTitle").textContent = `${es(d.home_team)} vs ${es(d.away_team)}`;
     $("#simInfo").textContent =
       `${fmtInt(d.n_simulations)} sims · ${d.has_market ? "con mercado" : "solo modelo"}`;
 
-    bar($('[data-row="home"]'), `Gana ${d.home_team}`, d.prediction.home, "bg-emerald-500");
+    bar($('[data-row="home"]'), `Gana ${es(d.home_team)}`, d.prediction.home, "bg-emerald-500");
     bar($('[data-row="draw"]'), "Empate", d.prediction.draw, "bg-slate-400");
-    bar($('[data-row="away"]'), `Gana ${d.away_team}`, d.prediction.away, "bg-sky-500");
+    bar($('[data-row="away"]'), `Gana ${es(d.away_team)}`, d.prediction.away, "bg-sky-500");
 
     const eh = Math.round(d.expected_goals.home);
     const ea = Math.round(d.expected_goals.away);
@@ -178,7 +184,7 @@ async function run() {
       .join("");
 
     renderChart(d.total_goals_dist);
-    renderCompare(d.components, d.has_market, d.home_team, d.away_team);
+    renderCompare(d.components, d.has_market, es(d.home_team), es(d.away_team));
 
     $("#results").classList.remove("hidden");
     $("#status").textContent = "";
@@ -199,12 +205,174 @@ function setTab(name) {
   document.querySelectorAll(".tab").forEach((b) =>
     b.classList.toggle("tab-active", b.dataset.tab === name)
   );
-  $("#pane-match").classList.toggle("hidden", name !== "match");
-  $("#pane-tournament").classList.toggle("hidden", name !== "tournament");
+  document.querySelectorAll("[data-pane]").forEach((p) =>
+    p.classList.toggle("hidden", p.dataset.pane !== name)
+  );
+  if (name === "fixture" && !fixtureLoaded) loadFixture();
 }
 document.querySelectorAll(".tab").forEach((b) =>
   b.addEventListener("click", () => setTab(b.dataset.tab))
 );
+
+// ---------------- Fixture ----------------
+let fixtureLoaded = false;
+let fixtureMatches = [];
+let fxFilter = "all";
+const STAGE_LABELS = {
+  group: "Grupos", r32: "Dieciseisavos", r16: "Octavos",
+  qf: "Cuartos", sf: "Semis", final: "Final", third: "3er puesto",
+};
+
+function fmtDate(iso) {
+  if (!iso) return null;
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" });
+}
+
+async function loadFixture() {
+  fixtureLoaded = true;
+  try {
+    const res = await fetch("/api/fixture");
+    const data = await res.json();
+    fixtureMatches = data.matches;
+    const playable = fixtureMatches.filter((m) => m.home && m.away).length;
+    $("#fxInfo").textContent =
+      `${fixtureMatches.length} partidos · ${playable} simulables` +
+      (data.source === "auto" ? " · día/hora/TV a cargar" : "");
+    renderFilters();
+    renderFixture();
+  } catch (e) {
+    $("#fxInfo").textContent = "No se pudo cargar el fixture.";
+  }
+}
+
+function renderFilters() {
+  const stages = ["all", ...new Set(fixtureMatches.map((m) => m.stage))];
+  $("#fxFilters").innerHTML = stages
+    .map((s) => {
+      const label = s === "all" ? "Todos" : STAGE_LABELS[s] || s;
+      return `<button data-f="${s}" class="fxf rounded-full border border-slate-700 px-3 py-1 text-xs transition ${
+        s === fxFilter ? "tab-active border-emerald-500" : "text-slate-400"
+      }">${label}</button>`;
+    })
+    .join("");
+  document.querySelectorAll(".fxf").forEach((b) =>
+    b.addEventListener("click", () => {
+      fxFilter = b.dataset.f;
+      renderFilters();
+      renderFixture();
+    })
+  );
+}
+
+function matchCard(m) {
+  const playable = m.home && m.away;
+  const when = fmtDate(m.date);
+  const meta = [
+    when ? `${when}${m.time ? " · " + m.time : ""}` : "Fecha a confirmar",
+    m.venue || null,
+  ].filter(Boolean);
+  const tv = (m.tv || []).length
+    ? m.tv.map((t) => `<span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300">📺 ${t}</span>`).join(" ")
+    : `<span class="text-[10px] text-slate-600">TV a confirmar</span>`;
+
+  const badge = m.group ? `Grupo ${m.group}` : STAGE_LABELS[m.stage] || m.stage_es;
+
+  return `
+  <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4" data-n="${m.n}">
+    <div class="flex items-center justify-between text-[11px] text-slate-500">
+      <span class="rounded bg-slate-800 px-2 py-0.5 font-medium text-slate-300">${badge}</span>
+      <span>#${m.n} · ${meta.join(" · ")}</span>
+    </div>
+    <div class="mt-3 flex items-center justify-between gap-2">
+      <span class="flex-1 text-right font-semibold">${m.home_es}</span>
+      <span class="text-slate-500 text-xs">vs</span>
+      <span class="flex-1 font-semibold">${m.away_es}</span>
+    </div>
+    <div class="mt-2 flex flex-wrap items-center gap-1.5">${tv}</div>
+    <div class="mt-3 flex items-center gap-3">
+      ${
+        playable
+          ? `<button class="fx-sim rounded-lg border border-emerald-600/60 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition">Simular</button>`
+          : `<span class="text-[11px] text-slate-600 italic">Se define con los resultados</span>`
+      }
+      <div class="fx-result flex-1 text-xs text-slate-400"></div>
+    </div>
+  </div>`;
+}
+
+function renderFixture() {
+  const shown = fixtureMatches.filter((m) => fxFilter === "all" || m.stage === fxFilter);
+  // Agrupar por etapa para encabezados.
+  const byStage = {};
+  shown.forEach((m) => (byStage[m.stage] = byStage[m.stage] || []).push(m));
+  $("#fxList").innerHTML = Object.entries(byStage)
+    .map(
+      ([stage, ms]) => `
+      <div>
+        <h3 class="mb-2 text-sm font-bold text-slate-300">${STAGE_LABELS[stage] || stage}</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${ms.map(matchCard).join("")}</div>
+      </div>`
+    )
+    .join("");
+
+  document.querySelectorAll("#fxList [data-n]").forEach((card) => {
+    const btn = card.querySelector(".fx-sim");
+    if (btn) btn.addEventListener("click", () => simulateCard(card));
+  });
+}
+
+async function simulateCard(card, nSims = 10000) {
+  const n = +card.dataset.n;
+  const m = fixtureMatches.find((x) => x.n === n);
+  const btn = card.querySelector(".fx-sim");
+  const out = card.querySelector(".fx-result");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "…";
+  }
+  try {
+    const res = await fetch("/api/simulate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ home_team: m.home, away_team: m.away, n_simulations: nSims }),
+    });
+    if (!res.ok) throw new Error("error");
+    const d = await res.json();
+    const eh = Math.round(d.expected_goals.home);
+    const ea = Math.round(d.expected_goals.away);
+    out.innerHTML = `
+      <span class="text-emerald-400 font-semibold">${fmtPct(d.prediction.home)}</span> ·
+      <span class="text-slate-400">${fmtPct(d.prediction.draw)}</span> ·
+      <span class="text-sky-400 font-semibold">${fmtPct(d.prediction.away)}</span>
+      <span class="text-slate-600">· ~${eh}-${ea}</span>`;
+  } catch (e) {
+    out.textContent = "Error";
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Simular";
+    }
+  }
+}
+
+async function runAllFixture() {
+  const btn = $("#runAll");
+  const cards = [...document.querySelectorAll("#fxList [data-n]")].filter((c) =>
+    c.querySelector(".fx-sim")
+  );
+  if (!cards.length) return;
+  btn.disabled = true;
+  let done = 0;
+  for (const card of cards) {
+    await simulateCard(card, 6000);
+    done++;
+    $("#fxProgress").textContent = `Simulados ${done}/${cards.length}…`;
+  }
+  $("#fxProgress").textContent = `✓ ${cards.length} partidos simulados.`;
+  btn.disabled = false;
+}
+$("#runAll").addEventListener("click", runAllFixture);
 
 // ---------------- Torneo completo ----------------
 async function runTournament() {
@@ -231,7 +399,7 @@ async function runTournament() {
         return `
         <tr class="border-b border-slate-800/60">
           <td class="py-2 pr-2 text-slate-500">${medal}</td>
-          <td class="py-2 pr-2 font-medium">${r.team}<span class="text-slate-600 text-xs ml-1">${r.elo}</span></td>
+          <td class="py-2 pr-2 font-medium">${es(r.team)}<span class="text-slate-600 text-xs ml-1">${r.elo}</span></td>
           <td class="py-2 pr-2">
             <div class="flex items-center gap-2 justify-end">
               <div class="hidden sm:block h-1.5 w-20 rounded-full bg-slate-800 overflow-hidden">
@@ -252,7 +420,7 @@ async function runTournament() {
         ([g, teams]) => `
         <div class="rounded-lg bg-slate-800/40 p-2">
           <div class="font-semibold text-slate-300 mb-1">Grupo ${g}</div>
-          ${teams.map((t) => `<div class="text-slate-400">${t}</div>`).join("")}
+          ${teams.map((t) => `<div class="text-slate-400">${es(t)}</div>`).join("")}
         </div>`
       )
       .join("");

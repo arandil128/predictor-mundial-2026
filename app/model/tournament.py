@@ -101,22 +101,75 @@ class _Engine:
         return a if rng.random() < pa else b
 
 
-def _seed_order(n: int) -> list[int]:
-    """Orden de siembra estándar de un cuadro de n (1 y 2 sólo se cruzan en la final)."""
-    order = [1]
-    while len(order) < n:
-        m = len(order) * 2
-        order = [x for s in order for x in (s, m + 1 - s)]
-    return order
+KO_BRACKET_PATH = DATA_DIR / "ko_bracket_2026.json"
+
+# Etiqueta de ronda alcanzada por el GANADOR de cada partido del árbol.
+_TREE_STAGE = {
+    **{m: "qf" for m in ("89", "90", "91", "92", "93", "94", "95", "96")},
+    **{m: "sf" for m in ("97", "98", "99", "100")},
+    **{m: "final" for m in ("101", "102")},
+    "104": "champion",
+}
+
+
+def load_ko_bracket() -> dict | None:
+    """Cuadro oficial de eliminatorias desde data/ko_bracket_2026.json, o None."""
+    if not KO_BRACKET_PATH.exists():
+        return None
+    try:
+        data = json.loads(KO_BRACKET_PATH.read_text(encoding="utf-8"))
+        r32, tree = data["round_of_32"], data["tree"]
+    except (json.JSONDecodeError, KeyError, OSError):
+        return None
+    if len(r32) != 16 or len(tree) != 15:
+        return None
+    return {"round_of_32": r32, "tree": tree}
+
+
+# ---------------------- Fase de grupos con desempate FIFA ----------------------
+
+def _result_between(results: dict, x: str, y: str) -> tuple[int, int]:
+    """Goles (de x, de y) en el partido directo, sin importar el orden guardado."""
+    if (x, y) in results:
+        return results[(x, y)]
+    gy, gx = results[(y, x)]
+    return gx, gy
+
+
+def _h2h_order(subset: list[str], results: dict, engine: _Engine) -> list[str]:
+    """Ordena un subconjunto empatado por enfrentamiento directo (criterio FIFA)."""
+    p = {t: 0 for t in subset}
+    gd = {t: 0 for t in subset}
+    gf = {t: 0 for t in subset}
+    for i in range(len(subset)):
+        for j in range(i + 1, len(subset)):
+            x, y = subset[i], subset[j]
+            gx, gy = _result_between(results, x, y)
+            gf[x] += gx
+            gf[y] += gy
+            gd[x] += gx - gy
+            gd[y] += gy - gx
+            if gx > gy:
+                p[x] += 3
+            elif gy > gx:
+                p[y] += 3
+            else:
+                p[x] += 1
+                p[y] += 1
+    return sorted(
+        subset, key=lambda t: (p[t], gd[t], gf[t], engine.elo[t]), reverse=True
+    )
 
 
 def _group_standings(rng, engine: _Engine, teams: list[str]) -> list[dict]:
-    """Round-robin de un grupo -> equipos ordenados por pts, GD, GF, Elo."""
+    """Round-robin de un grupo. Orden FIFA: Pts, DG, GF, enfrentamiento directo, Elo."""
     stats = {t: {"pts": 0, "gd": 0, "gf": 0} for t in teams}
+    results: dict[tuple[str, str], tuple[int, int]] = {}
     for i in range(len(teams)):
         for j in range(i + 1, len(teams)):
             a, b = teams[i], teams[j]
             ga, gb = engine.play(rng, a, b)
+            results[(a, b)] = (ga, gb)
             stats[a]["gf"] += ga
             stats[b]["gf"] += gb
             stats[a]["gd"] += ga - gb
@@ -128,46 +181,114 @@ def _group_standings(rng, engine: _Engine, teams: list[str]) -> list[dict]:
             else:
                 stats[a]["pts"] += 1
                 stats[b]["pts"] += 1
-    ranked = sorted(
-        teams,
-        key=lambda t: (stats[t]["pts"], stats[t]["gd"], stats[t]["gf"], engine.elo[t]),
+
+    # Orden primario por Pts, DG, GF; los empatados se resuelven por h2h.
+    base = sorted(
+        teams, key=lambda t: (stats[t]["pts"], stats[t]["gd"], stats[t]["gf"]), reverse=True
+    )
+    ordered: list[str] = []
+    i = 0
+    while i < len(base):
+        j = i
+        key = (stats[base[i]]["pts"], stats[base[i]]["gd"], stats[base[i]]["gf"])
+        while j < len(base) and (
+            stats[base[j]]["pts"], stats[base[j]]["gd"], stats[base[j]]["gf"]
+        ) == key:
+            j += 1
+        tie = base[i:j]
+        ordered.extend(_h2h_order(tie, results, engine) if len(tie) > 1 else tie)
+        i = j
+    return [{"team": t, **stats[t]} for t in ordered]
+
+
+# ----------------------- Asignación oficial de los terceros ---------------------
+
+def _third_slots(r32: dict) -> dict[str, set[str]]:
+    """Para cada partido con un tercero, el conjunto de grupos permitidos."""
+    slots = {}
+    for match, pair in r32.items():
+        if pair["away"].startswith("3:"):
+            slots[match] = set(pair["away"][2:].split("/"))
+    return slots
+
+
+def _allocate_thirds(
+    qualified_groups: list[str], slots: dict[str, set[str]]
+) -> dict[str, str]:
+    """Empareja los 8 grupos de terceros clasificados con los 8 cupos (criterio FIFA).
+
+    Emparejamiento bipartito por caminos aumentantes: respeta el conjunto de grupos
+    permitido por cada partido. (La tabla del Anexo C desempata cuál asignación
+    concreta cuando hay varias válidas; acá se toma una válida determinista.)
+    """
+    slot_ids = sorted(slots.keys())
+    group_to_slot: dict[str, str] = {}
+
+    def augment(slot: str, visited: set[str]) -> bool:
+        for g in qualified_groups:
+            if g in slots[slot] and g not in visited:
+                visited.add(g)
+                cur = group_to_slot.get(g)
+                if cur is None or augment(cur, visited):
+                    group_to_slot[g] = slot
+                    return True
+        return False
+
+    for slot in slot_ids:
+        augment(slot, set())
+
+    slot_to_group = {s: g for g, s in group_to_slot.items()}
+    # Salvaguarda (no debería ocurrir con el cuadro oficial): cupos sin asignar.
+    if len(slot_to_group) < len(slot_ids):
+        leftover = [g for g in qualified_groups if g not in group_to_slot]
+        for slot in slot_ids:
+            if slot not in slot_to_group and leftover:
+                slot_to_group[slot] = leftover.pop()
+    return slot_to_group
+
+
+# ----------------------------- Eliminatoria -----------------------------------
+
+def _run_official_knockout(rng, engine, standings: dict, bracket: dict, reached: dict) -> str:
+    """Juega el cuadro oficial (32avos -> final) y marca rondas alcanzadas."""
+    winners = {L: standings[L][0]["team"] for L in standings}
+    runners = {L: standings[L][1]["team"] for L in standings}
+    thirds = {L: standings[L][2] for L in standings}
+
+    ranked_third_groups = sorted(
+        standings.keys(),
+        key=lambda L: (
+            thirds[L]["pts"], thirds[L]["gd"], thirds[L]["gf"], engine.elo[thirds[L]["team"]]
+        ),
         reverse=True,
     )
-    return [{"team": t, **stats[t]} for t in ranked]
+    qualified = sorted(ranked_third_groups[:8])
+    slot_to_group = _allocate_thirds(qualified, _third_slots(bracket["round_of_32"]))
 
+    def resolve(slot: str) -> str:
+        pos, letter = slot[0], slot[1]
+        return winners[letter] if pos == "1" else runners[letter]
 
-def _qualifiers(rng, engine: _Engine, groups: dict[str, list[str]]) -> list[str]:
-    """1° y 2° de cada grupo + los 8 mejores 3° (32 clasificados)."""
-    winners, runners, thirds = [], [], []
-    for letter in GROUP_LETTERS:
-        standings = _group_standings(rng, engine, groups[letter])
-        winners.append(standings[0])
-        runners.append(standings[1])
-        thirds.append(standings[2])
-    best_thirds = sorted(
-        thirds,
-        key=lambda s: (s["pts"], s["gd"], s["gf"], engine.elo[s["team"]]),
-        reverse=True,
-    )[:8]
-    return [s["team"] for s in winners + runners + best_thirds]
+    result: dict[str, str] = {}
+    for match, pair in bracket["round_of_32"].items():
+        home = resolve(pair["home"])
+        if pair["away"].startswith("3:"):
+            away = thirds[slot_to_group[match]]["team"]
+        else:
+            away = resolve(pair["away"])
+        reached[home]["r32"] += 1
+        reached[away]["r32"] += 1
+        w = engine.knockout_winner(rng, home, away)
+        reached[w]["r16"] += 1
+        result[match] = w
 
+    for match in sorted(bracket["tree"], key=int):
+        f1, f2 = bracket["tree"][match]
+        w = engine.knockout_winner(rng, result[f1], result[f2])
+        reached[w][_TREE_STAGE[match]] += 1
+        result[match] = w
 
-def _run_knockout(rng, engine: _Engine, qualifiers: list[str], reached: dict) -> str:
-    """Cuadro de 32 sembrado por Elo. Devuelve el campeón y marca rondas alcanzadas."""
-    seeds = sorted(qualifiers, key=lambda t: engine.elo[t], reverse=True)
-    bracket = [seeds[o - 1] for o in _seed_order(32)]
-    # 'r32' = haber clasificado (todos los del cuadro).
-    for t in bracket:
-        reached[t]["r32"] += 1
-    round_stages = ["r16", "qf", "sf", "final", "champion"]
-    for stage in round_stages:
-        winners = []
-        for k in range(0, len(bracket), 2):
-            w = engine.knockout_winner(rng, bracket[k], bracket[k + 1])
-            reached[w][stage] += 1
-            winners.append(w)
-        bracket = winners
-    return bracket[0]
+    return result["104"]
 
 
 def simulate_tournament(
@@ -177,10 +298,11 @@ def simulate_tournament(
     engine = _Engine(teams)
     rng = np.random.default_rng(seed)
     reached = {t: {s: 0 for s in STAGES} for t in teams}
+    bracket = load_ko_bracket()
 
     for _ in range(n):
-        qualifiers = _qualifiers(rng, engine, groups)
-        _run_knockout(rng, engine, qualifiers, reached)
+        standings = {L: _group_standings(rng, engine, groups[L]) for L in groups}
+        _run_official_knockout(rng, engine, standings, bracket, reached)
 
     table = []
     for t in teams:
@@ -193,4 +315,5 @@ def simulate_tournament(
         "n_simulations": n,
         "groups": groups,
         "ranking": table,
+        "official_bracket": bracket is not None,
     }

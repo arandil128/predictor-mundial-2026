@@ -10,7 +10,7 @@ from app.config import STATIC_DIR, get_settings
 from app.model import blend as blend_mod
 from app.model import tournament as tournament_mod
 from app.model.montecarlo import simulate
-from app.services import fixtures, ratings
+from app.services import fixtures, ratings, schedule
 from app.services.odds import get_market_probs
 from app.services.ratings import elo_of, get_rating
 
@@ -39,6 +39,7 @@ async def api_matches() -> dict:
             "fixtures": settings.has_fixtures,
         },
         "elo_refreshed_at": ratings.last_refresh(),
+        "names_es": ratings.names_es_map(),
     }
 
 
@@ -99,6 +100,12 @@ async def api_simulate(req: SimulateRequest) -> dict:
         },
         "has_market": market is not None,
     }
+
+
+@app.get("/api/fixture")
+async def api_fixture() -> dict:
+    """Los 104 partidos del Mundial (con día/hora/TV si están cargados)."""
+    return schedule.build_fixture()
 
 
 @app.post("/api/simulate-tournament")

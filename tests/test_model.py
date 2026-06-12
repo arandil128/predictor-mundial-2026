@@ -8,8 +8,13 @@ from app.model.poisson import (
     outcome_probs,
     score_matrix,
 )
+import itertools
+
 from app.model.tournament import (
+    _allocate_thirds,
+    _third_slots,
     default_groups,
+    load_ko_bracket,
     official_groups,
     resolve_groups,
     simulate_tournament,
@@ -88,6 +93,44 @@ def test_resolve_groups_prefers_official():
     groups, official = resolve_groups()
     assert official is True
     assert len(groups) == 12
+
+
+def test_fixture_has_104_matches():
+    from app.services.schedule import build_fixture
+
+    fx = build_fixture()
+    matches = fx["matches"]
+    assert len(matches) == 104
+    # 72 de grupos con equipos definidos (simulables).
+    playable = [m for m in matches if m.get("home") and m.get("away")]
+    assert len(playable) == 72
+    # Todos tienen nombre mostrable en español (equipo o etiqueta de cupo).
+    assert all(m["home_es"] and m["away_es"] for m in matches)
+    # Numeración 1..104 completa.
+    assert sorted(m["n"] for m in matches) == list(range(1, 105))
+
+
+def test_ko_bracket_loads():
+    bracket = load_ko_bracket()
+    assert bracket is not None
+    assert len(bracket["round_of_32"]) == 16
+    assert len(bracket["tree"]) == 15
+
+
+def test_third_allocation_valid_for_all_combinations():
+    """Para cada una de las 495 combinaciones de 8 terceros, la asignación es
+    una bijección válida que respeta los grupos permitidos por cada partido."""
+    bracket = load_ko_bracket()
+    slots = _third_slots(bracket["round_of_32"])
+    assert len(slots) == 8
+    all_groups = list("ABCDEFGHIJKL")
+    for combo in itertools.combinations(all_groups, 8):
+        alloc = _allocate_thirds(sorted(combo), slots)
+        assert len(alloc) == 8  # todos los cupos asignados
+        assert set(alloc.keys()) == set(slots.keys())  # un cupo por partido
+        assert set(alloc.values()) == set(combo)  # cada tercero usado una vez
+        for match, group in alloc.items():
+            assert group in slots[match]  # respeta los grupos permitidos
 
 
 def test_tournament_probabilities_consistent():

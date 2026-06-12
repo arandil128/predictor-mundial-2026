@@ -11,7 +11,7 @@ import httpx
 
 from app.config import get_settings
 from app.services import cache
-from app.services.ratings import all_teams
+from app.services.ratings import all_teams, name_es
 
 FD_MATCHES_URL = "https://api.football-data.org/v4/competitions/WC/matches"
 _CACHE_KEY = "fixtures:world_cup"
@@ -63,6 +63,6 @@ async def get_matches() -> list[dict]:
 def available_teams() -> list[dict]:
     """Lista de selecciones para poblar los selectores de la UI."""
     return [
-        {"team": r.team, "code": r.code, "fifa_rank": r.fifa_rank}
+        {"team": r.team, "team_es": name_es(r.team), "code": r.code, "fifa_rank": r.fifa_rank}
         for r in all_teams()
     ]

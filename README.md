@@ -17,7 +17,9 @@
 ## ✨ Características
 
 - 🎯 **Predicción por partido**: probabilidades 1X2, marcador esperado, marcadores más probables, Over 2.5 y Ambos Marcan.
-- 🏆 **Simulación del torneo completo**: con los **grupos oficiales del sorteo** (48 equipos en 12 grupos), clasificación (1°, 2° + 8 mejores 3°) y eliminatoria hasta el campeón. Probabilidad de campeón, final, semis y clasificación por equipo. Los grupos viven en `data/groups_2026.json` (editable).
+- 🏆 **Simulación del torneo completo**: con los **grupos oficiales del sorteo** (48 equipos en 12 grupos), clasificación (1°, 2° + 8 mejores 3°) y el **cuadro oficial FIFA** de eliminatorias (emparejamientos fijos + asignación de terceros + desempate por enfrentamiento directo) hasta el campeón. Los grupos y el cuadro viven en `data/groups_2026.json` y `data/ko_bracket_2026.json` (editables).
+- 📅 **Fixture completo (104 partidos)**: una tarjeta por partido con día/hora/sede/TV, botón **Simular** por partido y **Simular todos**. Datos del calendario editables en `data/fixture_2026.json`.
+- 🇪🇸 **Nombres de selecciones en español** (`data/teams_es.json`).
 - 🎲 **Monte Carlo configurable**: vos elegís cuántas simulaciones correr. Más simulaciones ⇒ estimaciones más estables.
 - 📊 **Datos en vivo**: consulta cuotas y ratings en el momento de simular (con caché corta para respetar los límites de las APIs gratuitas).
 - ↻ **Refresco de Elo a requerimiento**: un botón descarga los ratings actuales desde una fuente abierta (gratis, sin clave) — sin polling automático, no gasta tus APIs.
@@ -142,10 +144,40 @@ render.yaml            blueprint para Render
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/api/matches` | Equipos disponibles, fixtures y estado de fuentes. |
+| `GET` | `/api/matches` | Equipos disponibles, nombres en español y estado de fuentes. |
+| `GET` | `/api/fixture` | Los 104 partidos con día/hora/sede/TV. |
 | `POST` | `/api/simulate` | Predicción de un partido (`home_team`, `away_team`, `n_simulations`). |
 | `POST` | `/api/simulate-tournament` | Simula el Mundial completo (`n_simulations`). |
 | `POST` | `/api/refresh-ratings` | Actualiza los Elo en vivo (a requerimiento). |
+
+### Cargar el calendario (`data/fixture_2026.json`)
+
+Si este archivo existe, la app lo usa; si no, genera los 104 partidos automáticamente
+(con día/hora/TV vacíos). Formato:
+
+```json
+{
+  "matches": [
+    {
+      "n": 1,
+      "stage": "group",
+      "group": "A",
+      "home": "Mexico",
+      "away": "South Korea",
+      "date": "2026-06-11",
+      "time": "21:00",
+      "venue": "Estadio Azteca, Ciudad de México",
+      "tv": ["TV Pública", "Telefe", "DSports"]
+    }
+  ]
+}
+```
+
+- `home`/`away` aceptan **nombre en inglés, en español o el código** (ej. `MEX`).
+- Para partidos de eliminatoria sin rival definido, usá `home_label`/`away_label`
+  (ej. `"Ganador 73"`) y dejá `home`/`away` en `null`.
+- `stage`: `group`, `r32`, `r16`, `qf`, `sf`, `third`, `final`.
+- `time` en hora de Argentina; `tv` es una lista de señales.
 
 ## 🗺️ Roadmap
 
