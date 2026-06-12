@@ -348,13 +348,22 @@ async function simulateCard(card, nSims = 10000) {
     });
     if (!res.ok) throw new Error("error");
     const d = await res.json();
-    const eh = Math.round(d.expected_goals.home);
-    const ea = Math.round(d.expected_goals.away);
+    const p = d.prediction;
+    // Favorito: mayor probabilidad entre local / empate / visitante.
+    const maxp = Math.max(p.home, p.draw, p.away);
+    const favLabel =
+      maxp === p.draw ? "Empate" : maxp === p.home ? es(m.home) : es(m.away);
+    const top = (d.top_scorelines && d.top_scorelines[0]) || null;
     out.innerHTML = `
-      <span class="text-emerald-400 font-semibold">${fmtPct(d.prediction.home)}</span> ·
-      <span class="text-slate-400">${fmtPct(d.prediction.draw)}</span> ·
-      <span class="text-sky-400 font-semibold">${fmtPct(d.prediction.away)}</span>
-      <span class="text-slate-600">· ~${eh}-${ea}</span>`;
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span>
+          <span class="text-emerald-400 font-semibold">L ${fmtPct(p.home)}</span> ·
+          <span class="text-slate-400">X ${fmtPct(p.draw)}</span> ·
+          <span class="text-sky-400 font-semibold">V ${fmtPct(p.away)}</span>
+        </span>
+        ${top ? `<span class="text-slate-500">🎯 ${top.score} <span class="text-slate-600">(${fmtPct(top.prob)})</span></span>` : ""}
+        <span class="rounded bg-amber-500/15 text-amber-300 border border-amber-600/40 px-1.5 py-0.5 text-[10px] font-semibold">⭐ ${favLabel}</span>
+      </div>`;
   } catch (e) {
     out.textContent = "Error";
   } finally {
