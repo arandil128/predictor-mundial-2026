@@ -217,11 +217,36 @@ document.querySelectorAll(".tab").forEach((b) =>
 // ---------------- Fixture ----------------
 let fixtureLoaded = false;
 let fixtureMatches = [];
-let fxFilter = "all";
+let fxSource = "file";
+// Filtros activos: fecha (ISO), grupo (A..L) y país (nombre en inglés). "all" = sin filtrar.
+const fxF = { date: "all", group: "all", country: "all" };
 const STAGE_LABELS = {
   group: "Grupos", r32: "Dieciseisavos", r16: "Octavos",
   qf: "Cuartos", sf: "Semis", final: "Final", third: "3er puesto",
 };
+
+// Código FIFA (3 letras) -> ISO 3166-1 alpha-2, para mostrar la bandera (flagcdn.com).
+const FIFA2ISO = {
+  ARG: "ar", FRA: "fr", ESP: "es", ENG: "gb-eng", BRA: "br", POR: "pt", NED: "nl",
+  BEL: "be", ITA: "it", GER: "de", CRO: "hr", URU: "uy", COL: "co", MAR: "ma",
+  SUI: "ch", DEN: "dk", MEX: "mx", USA: "us", SEN: "sn", JPN: "jp", ECU: "ec",
+  AUT: "at", UKR: "ua", IRN: "ir", KOR: "kr", SWE: "se", SRB: "rs", POL: "pl",
+  WAL: "gb-wls", AUS: "au", PER: "pe", HUN: "hu", TUR: "tr", NGA: "ng", NOR: "no",
+  EGY: "eg", CZE: "cz", SCO: "gb-sct", CHI: "cl", ALG: "dz", GRE: "gr", CMR: "cm",
+  TUN: "tn", CAN: "ca", CIV: "ci", ROU: "ro", CRC: "cr", PAR: "py", GHA: "gh",
+  KSA: "sa", SVK: "sk", SVN: "si", MLI: "ml", QAT: "qa", VEN: "ve", IRQ: "iq",
+  IRL: "ie", BIH: "ba", FIN: "fi", PAN: "pa", RSA: "za", BFA: "bf", ALB: "al",
+  MKD: "mk", CPV: "cv", GEO: "ge", UAE: "ae", JAM: "jm", UZB: "uz", COD: "cd",
+  JOR: "jo", HON: "hn", OMA: "om", BOL: "bo", NZL: "nz", CUW: "cw", HAI: "ht",
+};
+
+function flag(code) {
+  const iso = FIFA2ISO[code];
+  if (!iso) return "";
+  return `<img src="https://flagcdn.com/w40/${iso}.png" alt="" loading="lazy"
+    class="h-4 w-6 shrink-0 rounded-[3px] object-cover ring-1 ring-black/40"
+    onerror="this.style.display='none'">`;
+}
 
 function fmtDate(iso) {
   if (!iso) return null;
@@ -235,43 +260,85 @@ async function loadFixture() {
     const res = await fetch("/api/fixture");
     const data = await res.json();
     fixtureMatches = data.matches;
-    const playable = fixtureMatches.filter((m) => m.home && m.away).length;
-    $("#fxInfo").textContent =
-      `${fixtureMatches.length} partidos · ${playable} simulables` +
-      (data.source === "auto" ? " · día/hora/TV a cargar" : "");
-    renderFilters();
-    renderFixture();
+    fxSource = data.source;
+    renderFilterBar();
+    applyFilters();
   } catch (e) {
     $("#fxInfo").textContent = "No se pudo cargar el fixture.";
   }
 }
 
-function renderFilters() {
-  const stages = ["all", ...new Set(fixtureMatches.map((m) => m.stage))];
-  $("#fxFilters").innerHTML = stages
-    .map((s) => {
-      const label = s === "all" ? "Todos" : STAGE_LABELS[s] || s;
-      return `<button data-f="${s}" class="fxf rounded-full border border-slate-700 px-3 py-1 text-xs transition ${
-        s === fxFilter ? "tab-active border-emerald-500" : "text-slate-400"
-      }">${label}</button>`;
-    })
-    .join("");
-  document.querySelectorAll(".fxf").forEach((b) =>
-    b.addEventListener("click", () => {
-      fxFilter = b.dataset.f;
-      renderFilters();
-      renderFixture();
-    })
-  );
+function renderFilterBar() {
+  const uniq = (arr) => [...new Set(arr)];
+  const dates = uniq(fixtureMatches.filter((m) => m.date).map((m) => m.date)).sort();
+  const groups = uniq(fixtureMatches.filter((m) => m.group).map((m) => m.group)).sort();
+  const countries = uniq(
+    fixtureMatches.flatMap((m) => [m.home, m.away]).filter(Boolean)
+  ).sort((a, b) => es(a).localeCompare(es(b), "es"));
+
+  const opt = (val, label, sel) =>
+    `<option value="${val}"${sel === val ? " selected" : ""}>${label}</option>`;
+  const selCls =
+    "w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500";
+
+  $("#fxFilters").innerHTML = `
+    <div>
+      <label class="block text-[11px] font-medium text-slate-400 mb-1">📅 Fecha</label>
+      <select id="fDate" class="${selCls}">
+        ${opt("all", "Todas las fechas", fxF.date)}
+        ${dates.map((d) => opt(d, fmtDate(d), fxF.date)).join("")}
+      </select>
+    </div>
+    <div>
+      <label class="block text-[11px] font-medium text-slate-400 mb-1">🏟️ Grupo</label>
+      <select id="fGroup" class="${selCls}">
+        ${opt("all", "Todos los grupos", fxF.group)}
+        ${groups.map((g) => opt(g, "Grupo " + g, fxF.group)).join("")}
+      </select>
+    </div>
+    <div>
+      <label class="block text-[11px] font-medium text-slate-400 mb-1">🌐 País</label>
+      <select id="fCountry" class="${selCls}">
+        ${opt("all", "Todos los países", fxF.country)}
+        ${countries.map((c) => opt(c, es(c), fxF.country)).join("")}
+      </select>
+    </div>`;
+
+  $("#fDate").onchange = (e) => { fxF.date = e.target.value; applyFilters(); };
+  $("#fGroup").onchange = (e) => { fxF.group = e.target.value; applyFilters(); };
+  $("#fCountry").onchange = (e) => { fxF.country = e.target.value; applyFilters(); };
+}
+
+function matchesFilter(m) {
+  if (fxF.date !== "all" && m.date !== fxF.date) return false;
+  if (fxF.group !== "all" && m.group !== fxF.group) return false;
+  if (fxF.country !== "all" && m.home !== fxF.country && m.away !== fxF.country) return false;
+  return true;
+}
+
+function applyFilters() {
+  const shown = fixtureMatches.filter(matchesFilter);
+  const playable = shown.filter((m) => m.home && m.away).length;
+  const nActive = (fxF.date !== "all") + (fxF.group !== "all") + (fxF.country !== "all");
+  $("#fxInfo").innerHTML =
+    `${shown.length} partido${shown.length === 1 ? "" : "s"} · ${playable} simulable${playable === 1 ? "" : "s"}` +
+    (fxSource === "auto" ? " · día/hora/TV a cargar" : "") +
+    (nActive
+      ? ` · <button id="fxClear" class="text-emerald-400 hover:underline">limpiar filtros</button>`
+      : "");
+  const clear = $("#fxClear");
+  if (clear)
+    clear.onclick = () => {
+      fxF.date = fxF.group = fxF.country = "all";
+      renderFilterBar();
+      applyFilters();
+    };
+  renderFixture(shown);
 }
 
 function matchCard(m) {
   const playable = m.home && m.away;
   const when = fmtDate(m.date);
-  const meta = [
-    when ? `${when}${m.time ? " · " + m.time : ""}` : "Fecha a confirmar",
-    m.venue || null,
-  ].filter(Boolean);
   const ABIERTA = ["TV Pública", "Telefe", "TyC Sports"];
   const tv = (m.tv || []).length
     ? m.tv
@@ -286,19 +353,27 @@ function matchCard(m) {
     : `<span class="text-[10px] text-slate-600">TV a confirmar</span>`;
 
   const badge = m.group ? `Grupo ${m.group}` : STAGE_LABELS[m.stage] || m.stage_es;
+  const homeFlag = m.home_code ? flag(m.home_code) : "";
+  const awayFlag = m.away_code ? flag(m.away_code) : "";
 
   return `
-  <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4" data-n="${m.n}">
+  <div class="group rounded-xl border border-slate-800 bg-slate-900/60 p-4 transition hover:border-emerald-600/50 hover:bg-slate-900" data-n="${m.n}">
     <div class="flex items-center justify-between text-[11px] text-slate-500">
       <span class="rounded bg-slate-800 px-2 py-0.5 font-medium text-slate-300">${badge}</span>
-      <span>#${m.n} · ${meta.join(" · ")}</span>
+      <span class="tabular-nums">#${m.n}${when ? " · " + when : ""}${m.time ? " · " + m.time : ""}</span>
     </div>
-    <div class="mt-3 flex items-center justify-between gap-2">
-      <span class="flex-1 text-right font-semibold">${m.home_es}</span>
-      <span class="text-slate-500 text-xs">vs</span>
-      <span class="flex-1 font-semibold">${m.away_es}</span>
+
+    <div class="mt-3 flex items-center gap-2">
+      <div class="flex flex-1 items-center justify-end gap-2 text-right">
+        ${homeFlag}<span class="font-semibold leading-tight">${m.home_es}</span>
+      </div>
+      <span class="px-1 text-[11px] font-semibold text-slate-500">vs</span>
+      <div class="flex flex-1 items-center gap-2">
+        <span class="font-semibold leading-tight">${m.away_es}</span>${awayFlag}
+      </div>
     </div>
-    <div class="mt-2 flex flex-wrap items-center gap-1.5">${tv}</div>
+
+    <div class="mt-2.5 flex flex-wrap items-center gap-1.5">${tv}</div>
     <div class="mt-3 flex items-center gap-3">
       ${
         playable
@@ -307,14 +382,19 @@ function matchCard(m) {
       }
       <div class="fx-result flex-1 text-xs text-slate-400"></div>
     </div>
+    ${m.venue ? `<div class="mt-2 text-[10px] text-slate-600">📍 ${m.venue}</div>` : ""}
   </div>`;
 }
 
-function renderFixture() {
-  const shown = fixtureMatches.filter((m) => fxFilter === "all" || m.stage === fxFilter);
+function renderFixture(list) {
+  if (!list.length) {
+    $("#fxList").innerHTML =
+      `<p class="py-12 text-center text-sm text-slate-500">No hay partidos con esos filtros.</p>`;
+    return;
+  }
   // Agrupar por etapa para encabezados.
   const byStage = {};
-  shown.forEach((m) => (byStage[m.stage] = byStage[m.stage] || []).push(m));
+  list.forEach((m) => (byStage[m.stage] = byStage[m.stage] || []).push(m));
   $("#fxList").innerHTML = Object.entries(byStage)
     .map(
       ([stage, ms]) => `

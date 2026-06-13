@@ -162,6 +162,11 @@ def build_fixture() -> dict:
         home, away = m.get("home"), m.get("away")
         m["home_es"] = name_es(home) if home else m.get("home_label", "")
         m["away_es"] = name_es(away) if away else m.get("away_label", "")
+        # Código FIFA (ARG, BRA…) para que el frontend muestre la bandera.
+        rh = get_rating(home) if home else None
+        ra = get_rating(away) if away else None
+        m["home_code"] = rh.code if rh else None
+        m["away_code"] = ra.code if ra else None
         m["stage_es"] = STAGE_ES.get(m.get("stage"), "")
         m.setdefault("tv", [])
     return {"matches": matches, "source": source}
