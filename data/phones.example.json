@@ -1,0 +1,5 @@
+{
+  "_comment": "Copiá este archivo a data/phones.json y poné los teléfonos reales. Formato {nombre: telefono} en formato internacional sin signos (ej. 5491123456789). data/phones.json está en .gitignore (no se sube al repo).",
+  "Pablo": "5491112345678",
+  "Juan": "5492213334444"
+}

@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     # Goles esperados base por equipo en un partido equilibrado.
     base_lambda: float = 1.35
 
+    # --- WhatsApp: resumen diario de partidos vía Evolution API ---
+    evolution_api_url: str = ""      # URL del servidor de Evolution API
+    evolution_instance: str = ""     # nombre de la instancia
+    evolution_api_key: str = ""      # API key de la instancia
+    whatsapp_phones_file: str = ""   # ruta al JSON {nombre: telefono} (default data/phones.json)
+    whatsapp_phones: str = ""        # alternativa: el JSON {nombre: telefono} inline (útil en deploy)
+    daily_send_time: str = "07:30"   # hora del envío diario (HH:MM)
+    daily_timezone: str = "America/Argentina/Buenos_Aires"
+
     @property
     def has_odds(self) -> bool:
         return bool(self.odds_api_key)
@@ -39,6 +48,10 @@ class Settings(BaseSettings):
     @property
     def has_fixtures(self) -> bool:
         return bool(self.football_data_api_key or self.api_football_key)
+
+    @property
+    def has_whatsapp(self) -> bool:
+        return bool(self.evolution_api_url and self.evolution_instance and self.evolution_api_key)
 
 
 @lru_cache

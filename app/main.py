@@ -18,6 +18,17 @@ from app.services.ratings import elo_of, get_rating
 app = FastAPI(title="Predicción Mundial 2026")
 
 
+@app.on_event("startup")
+async def _start_daily_whatsapp() -> None:
+    """Arranca el envío diario por WhatsApp si Evolution API está configurado."""
+    import asyncio
+
+    from app.services import daily
+
+    if get_settings().has_whatsapp:
+        asyncio.create_task(daily.scheduler_loop())
+
+
 class SimulateRequest(BaseModel):
     home_team: str = Field(..., min_length=1)
     away_team: str = Field(..., min_length=1)
@@ -125,6 +136,26 @@ def api_simulate_tournament(req: TournamentRequest) -> dict:
     result = tournament_mod.simulate_tournament(groups, req.n_simulations)
     result["official_groups"] = official
     return result
+
+
+@app.post("/api/send-daily")
+async def api_send_daily(dry_run: bool = False) -> dict:
+    """Envía el resumen de partidos de hoy por WhatsApp (manual).
+
+    Con `?dry_run=true` devuelve el mensaje SIN enviarlo (para previsualizar).
+    """
+    from app.services import daily
+
+    if dry_run:
+        day = daily.today_local()
+        matches = daily.todays_matches(day)
+        return {
+            "status": "dry_run",
+            "date": day.isoformat(),
+            "matches": len(matches),
+            "message": daily.format_daily_message(matches, day),
+        }
+    return await daily.send_daily_summary(force=True)
 
 
 @app.get("/")

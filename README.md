@@ -122,6 +122,41 @@ Sin claves la app funciona con el dataset Elo semilla (`data/elo_ratings.csv`).
 
 ---
 
+## 📲 Resumen diario por WhatsApp (Evolution API)
+
+Si configurás Evolution API, la app manda **todos los días** a la hora elegida (default **07:30**, hora argentina) el listado de los partidos del día a una lista de teléfonos:
+
+```
+⚽ Partidos de hoy — sábado 13 de junio
+
+16:00 hs   🇶🇦 Catar vs Suiza 🇨🇭
+19:00 hs   🇧🇷 Brasil vs Marruecos 🇲🇦
+22:00 hs   🇭🇹 Haití vs Escocia 🏴󠁧󠁢󠁳󠁣󠁴󠁿
+```
+
+| Variable | Para qué |
+|----------|----------|
+| `EVOLUTION_API_URL` | URL del servidor de Evolution API. |
+| `EVOLUTION_INSTANCE` | Nombre de la instancia. |
+| `EVOLUTION_API_KEY` | API key de la instancia. |
+| `WHATSAPP_PHONES_FILE` | Ruta al JSON de teléfonos (opcional; default `data/phones.json`). |
+| `DAILY_SEND_TIME` | Hora del envío `HH:MM` (default `07:30`). |
+| `DAILY_TIMEZONE` | Zona horaria (default `America/Argentina/Buenos_Aires`). |
+
+**Teléfonos** — copiá `data/phones.example.json` a `data/phones.json` (este último está en `.gitignore`) con el formato `{ "nombre": "telefono" }`, en formato internacional sin signos:
+
+```json
+{ "Pablo": "5491112345678", "Juan": "5492213334444" }
+```
+
+- El envío es **idempotente por día** (no manda duplicados si el proceso se reinicia).
+- Probar/forzar a mano: `python scripts/send_daily.py --dry-run` (muestra el mensaje sin enviar) o sin `--dry-run` para enviar. También vía API: `POST /api/send-daily?dry_run=true`.
+- Si preferís no depender del proceso web, agendá `scripts/send_daily.py` con cron / Programador de tareas.
+
+> Sin las variables `EVOLUTION_*` la función queda desactivada y el resto de la app funciona igual.
+
+---
+
 ## ☁️ Despliegue en EasyPanel (Docker)
 
 1. En EasyPanel: **Create → App → Source: GitHub** y elegí este repositorio.
@@ -156,6 +191,10 @@ app/
     fixtures.py        football-data.org → partidos/equipos
     ratings.py         carga Elo/FIFA (CSV semilla)
     cache.py           caché en memoria con TTL
+    schedule.py        arma el fixture de 104 partidos para la UI
+    daily.py           resumen diario de partidos + scheduler 07:30
+    whatsapp.py        cliente de Evolution API (envío de mensajes)
+    flags.py           código FIFA → bandera emoji (WhatsApp)
   model/
     poisson.py         matriz Dixon-Coles, muestreo, calibración al mercado
     fitting.py         ajuste por MLE del modelo ataque/defensa (gradiente analítico)
@@ -167,8 +206,10 @@ app/
 data/elo_ratings.csv   ratings semilla / fallback
 data/model_params.json ataque/defensa + μ/ventaja/ρ calibrados (lo crea calibrate.py)
 data/groups_2026.json  grupos oficiales del sorteo (editable)
+data/phones.json       teléfonos del resumen WhatsApp (en .gitignore; ver .example)
 scripts/calibrate.py   ajusta el modelo con datos abiertos de partidos reales
 scripts/backtest.py    validación out-of-sample (nuevo vs viejo vs baseline)
+scripts/send_daily.py  envía/previsualiza el resumen diario por WhatsApp
 static/                index.html + app.js (UI)
 tests/                 sanidad del modelo + chequeo de gradiente
 Dockerfile             imagen para EasyPanel / Docker
@@ -186,6 +227,7 @@ render.yaml            blueprint para Render
 | `POST` | `/api/simulate` | Predicción de un partido (`home_team`, `away_team`, `n_simulations`). |
 | `POST` | `/api/simulate-tournament` | Simula el Mundial completo (`n_simulations`). |
 | `POST` | `/api/refresh-ratings` | Actualiza los Elo en vivo (a requerimiento). |
+| `POST` | `/api/send-daily` | Envía el resumen de hoy por WhatsApp (`?dry_run=true` solo previsualiza). |
 
 ### Cargar el calendario (`data/fixture_2026.json`)
 
