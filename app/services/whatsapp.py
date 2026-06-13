@@ -59,14 +59,26 @@ def load_phones() -> dict[str, str]:
     }
 
 
+def _endpoint() -> str:
+    settings = get_settings()
+    base = settings.evolution_api_url.strip().rstrip("/")
+    return f"{base}/message/sendText/{settings.evolution_instance.strip()}"
+
+
 async def send_text(client: httpx.AsyncClient, number: str, text: str) -> dict:
     """Envía un texto a un número vía Evolution API (formato v2: number + text)."""
-    settings = get_settings()
-    url = f"{settings.evolution_api_url.rstrip('/')}/message/sendText/{settings.evolution_instance}"
-    headers = {"apikey": settings.evolution_api_key, "Content-Type": "application/json"}
-    resp = await client.post(url, json={"number": number, "text": text}, headers=headers)
+    headers = {"apikey": get_settings().evolution_api_key.strip(), "Content-Type": "application/json"}
+    resp = await client.post(_endpoint(), json={"number": number, "text": text}, headers=headers)
     resp.raise_for_status()
     return resp.json()
+
+
+def _describe_error(exc: Exception) -> str:
+    """Mensaje de error útil (tipo + estado HTTP + cuerpo), para diagnosticar."""
+    if isinstance(exc, httpx.HTTPStatusError):
+        body = exc.response.text[:300].replace("\n", " ")
+        return f"HTTP {exc.response.status_code}: {body}"
+    return f"{type(exc).__name__}: {exc or '(sin mensaje)'}"
 
 
 async def send_to_all(text: str) -> dict:
@@ -80,13 +92,15 @@ async def send_to_all(text: str) -> dict:
 
     detail: dict[str, str] = {}
     sent = failed = 0
-    async with httpx.AsyncClient(timeout=20) as client:
+    # follow_redirects: algunos proxies (Traefik/EasyPanel) redirigen; sin esto, un
+    # 3xx se interpretaría mal. Timeout amplio por si el server tarda en responder.
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
         for name, number in phones.items():
             try:
                 await send_text(client, number, text)
                 detail[name] = "ok"
                 sent += 1
             except Exception as exc:  # noqa: BLE001 — reportamos por destinatario, no abortamos
-                detail[name] = f"error: {exc}"
+                detail[name] = _describe_error(exc)
                 failed += 1
     return {"sent": sent, "failed": failed, "detail": detail}
