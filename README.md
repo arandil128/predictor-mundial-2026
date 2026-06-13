@@ -122,9 +122,9 @@ Sin claves la app funciona con el dataset Elo semilla (`data/elo_ratings.csv`).
 
 ---
 
-## 📲 Resumen diario por WhatsApp (Evolution API)
+## 📲 Notificaciones por WhatsApp (Evolution API)
 
-Si configurás Evolution API, la app manda **todos los días** a la hora elegida (default **07:30**, hora argentina) el listado de los partidos del día a una lista de teléfonos:
+Manda **todos los días** a la hora elegida (default **07:30**, hora argentina) el listado de partidos del día a una lista de teléfonos:
 
 ```
 ⚽ Partidos de hoy — sábado 13 de junio
@@ -139,21 +139,48 @@ Si configurás Evolution API, la app manda **todos los días** a la hora elegida
 | `EVOLUTION_API_URL` | URL del servidor de Evolution API. |
 | `EVOLUTION_INSTANCE` | Nombre de la instancia. |
 | `EVOLUTION_API_KEY` | API key de la instancia. |
-| `WHATSAPP_PHONES_FILE` | Ruta al JSON de teléfonos (opcional; default `data/phones.json`). |
+| `WHATSAPP_PHONES` | JSON `{nombre: telefono}` inline (cómodo en deploy; tiene prioridad). |
+| `WHATSAPP_PHONES_FILE` | Ruta al JSON de teléfonos (default `data/phones.json`). |
 | `DAILY_SEND_TIME` | Hora del envío `HH:MM` (default `07:30`). |
 | `DAILY_TIMEZONE` | Zona horaria (default `America/Argentina/Buenos_Aires`). |
+| `DAILY_SCHEDULER_ENABLED` | Scheduler embebido en la app web (default `true`). |
 
-**Teléfonos** — copiá `data/phones.example.json` a `data/phones.json` (este último está en `.gitignore`) con el formato `{ "nombre": "telefono" }`, en formato internacional sin signos:
+**Teléfonos** — copiá `data/phones.example.json` a `data/phones.json` (en `.gitignore`) con el formato `{ "nombre": "telefono" }`, en formato internacional sin signos; o pasalos por la env var `WHATSAPP_PHONES`:
 
 ```json
 { "Pablo": "5491112345678", "Juan": "5492213334444" }
 ```
 
-- El envío es **idempotente por día** (no manda duplicados si el proceso se reinicia).
-- Probar/forzar a mano: `python scripts/send_daily.py --dry-run` (muestra el mensaje sin enviar) o sin `--dry-run` para enviar. También vía API: `POST /api/send-daily?dry_run=true`.
-- Si preferís no depender del proceso web, agendá `scripts/send_daily.py` con cron / Programador de tareas.
+### Dos formas de enviar
 
-> Sin las variables `EVOLUTION_*` la función queda desactivada y el resto de la app funciona igual.
+**A) Servicio aparte y liviano (recomendado, ahorra recursos).** Un proceso chico que **no carga el predictor** (sin numpy/scipy/FastAPI), corre por cron, manda y termina:
+
+```bash
+python scripts/notify.py matches             # envía el resumen de hoy
+python scripts/notify.py matches --dry-run   # muestra el mensaje, no envía
+python scripts/notify.py --list              # lista los jobs disponibles
+```
+
+- Deploy: `Dockerfile.sender` (imagen mínima con `requirements-sender.txt`) o el servicio `type: cron` ya definido en `render.yaml` (10:30 UTC = 07:30 ART).
+- Cron clásico: `30 7 * * *  cd /app && python scripts/notify.py matches`.
+
+**B) Scheduler embebido en la app web.** Si la app del predictor ya corre 24/7, manda sola a la hora configurada. Si usás la opción A, poné `DAILY_SCHEDULER_ENABLED=false` acá para no enviar dos veces.
+
+> Sin las variables `EVOLUTION_*` la función queda desactivada y el resto de la app funciona igual. También podés probar vía API: `POST /api/send-daily?dry_run=true`.
+
+### Agregar un tipo de mensaje nuevo (reutilizable)
+
+El servicio es genérico: el envío (`app/services/whatsapp.py`) y los teléfonos se reusan; cada tipo de mensaje es un **job** en `app/services/notifier.py`. Para sumar uno (p. ej. cumpleaños o agenda del día):
+
+```python
+# en app/services/notifier.py
+def _birthdays_message() -> str:
+    return "🎂 Cumpleaños de hoy: ..."
+
+JOBS["birthdays"] = _birthdays_message
+```
+
+Y lo agendás igual que `matches`: `python scripts/notify.py birthdays`.
 
 ---
 
@@ -192,7 +219,8 @@ app/
     ratings.py         carga Elo/FIFA (CSV semilla)
     cache.py           caché en memoria con TTL
     schedule.py        arma el fixture de 104 partidos para la UI
-    daily.py           resumen diario de partidos + scheduler 07:30
+    notifier.py        servicio genérico de notificaciones (registro de jobs)
+    daily.py           job de partidos del día + scheduler 07:30
     whatsapp.py        cliente de Evolution API (envío de mensajes)
     flags.py           código FIFA → bandera emoji (WhatsApp)
   model/
@@ -209,11 +237,14 @@ data/groups_2026.json  grupos oficiales del sorteo (editable)
 data/phones.json       teléfonos del resumen WhatsApp (en .gitignore; ver .example)
 scripts/calibrate.py   ajusta el modelo con datos abiertos de partidos reales
 scripts/backtest.py    validación out-of-sample (nuevo vs viejo vs baseline)
+scripts/notify.py      servicio liviano de notificaciones (corre un job y envía)
 scripts/send_daily.py  envía/previsualiza el resumen diario por WhatsApp
 static/                index.html + app.js (UI)
 tests/                 sanidad del modelo + chequeo de gradiente
-Dockerfile             imagen para EasyPanel / Docker
-render.yaml            blueprint para Render
+Dockerfile             imagen del predictor (web) para EasyPanel / Docker
+Dockerfile.sender      imagen LIVIANA solo del servicio de notificaciones
+requirements-sender.txt deps mínimas del sender (sin numpy/scipy/FastAPI)
+render.yaml            blueprint para Render (web + cron del notificador)
 ```
 
 ---

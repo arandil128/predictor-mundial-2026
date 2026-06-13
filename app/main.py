@@ -20,12 +20,17 @@ app = FastAPI(title="Predicción Mundial 2026")
 
 @app.on_event("startup")
 async def _start_daily_whatsapp() -> None:
-    """Arranca el envío diario por WhatsApp si Evolution API está configurado."""
+    """Arranca el envío diario por WhatsApp si está configurado y habilitado.
+
+    Si usás el servicio separado (scripts/notify.py por cron) poné
+    DAILY_SCHEDULER_ENABLED=false para no duplicar envíos.
+    """
     import asyncio
 
     from app.services import daily
 
-    if get_settings().has_whatsapp:
+    settings = get_settings()
+    if settings.has_whatsapp and settings.daily_scheduler_enabled:
         asyncio.create_task(daily.scheduler_loop())
 
 

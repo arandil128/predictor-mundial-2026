@@ -9,3 +9,6 @@ __pycache__/
 *.log
 .DS_Store
 plans/
+# Datos personales / estado local: el sender usa la env var WHATSAPP_PHONES.
+data/phones.json
+data/.daily_sent

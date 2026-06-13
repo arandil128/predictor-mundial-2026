@@ -16,3 +16,23 @@ services:
         value: "0.65"
       - key: CACHE_TTL_SECONDS
         value: "300"
+
+  # Servicio aparte y LIVIANO: manda el resumen diario por WhatsApp y termina.
+  # No usa el predictor (instala solo requirements-sender.txt). Corre por cron, así
+  # que no consume recursos en reposo. Schedule en UTC: 10:30 UTC = 07:30 ART (UTC-3).
+  - type: cron
+    name: notificador-whatsapp
+    runtime: python
+    plan: free
+    schedule: "30 10 * * *"
+    buildCommand: pip install -r requirements-sender.txt
+    startCommand: python scripts/notify.py matches
+    envVars:
+      - key: EVOLUTION_API_URL
+        sync: false
+      - key: EVOLUTION_INSTANCE
+        sync: false
+      - key: EVOLUTION_API_KEY
+        sync: false
+      - key: WHATSAPP_PHONES
+        sync: false

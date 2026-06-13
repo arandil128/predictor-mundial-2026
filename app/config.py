@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     whatsapp_phones: str = ""        # alternativa: el JSON {nombre: telefono} inline (útil en deploy)
     daily_send_time: str = "07:30"   # hora del envío diario (HH:MM)
     daily_timezone: str = "America/Argentina/Buenos_Aires"
+    # Scheduler dentro de la app web. Apagalo (false) si usás el servicio separado
+    # (scripts/notify.py por cron), para no enviar dos veces.
+    daily_scheduler_enabled: bool = True
 
     @property
     def has_odds(self) -> bool:

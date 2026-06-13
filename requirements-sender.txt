@@ -1,0 +1,8 @@
+# Dependencias MÍNIMAS del servicio de notificaciones por WhatsApp (scripts/notify.py).
+# A propósito NO incluye numpy/scipy/fastapi/uvicorn (el predictor): imagen chica,
+# arranque rápido y bajo consumo. Ideal para correr por cron y terminar.
+httpx==0.28.1
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+tzdata==2024.2

@@ -12,8 +12,12 @@ from __future__ import annotations
 import json
 
 from app.config import DATA_DIR
-from app.model.tournament import load_ko_bracket, resolve_groups
 from app.services.ratings import get_rating, name_es, names_es_map
+
+# Nota: `load_ko_bracket`/`resolve_groups` (que arrastran numpy/scipy vía el modelo)
+# se importan PEREZOSAMENTE dentro de `_generate()`. Así, cuando existe
+# data/fixture_2026.json (el caso normal), leer el fixture NO carga el modelo
+# pesado — clave para el servicio liviano de notificaciones (scripts/notify.py).
 
 FIXTURE_PATH = DATA_DIR / "fixture_2026.json"
 
@@ -71,6 +75,9 @@ def _canonical_team(name: str | None) -> str | None:
 
 def _generate() -> list[dict]:
     """Genera los 104 partidos a partir de grupos + cuadro (sin día/hora/TV)."""
+    # Import perezoso: solo acá se necesita el modelo (numpy/scipy).
+    from app.model.tournament import load_ko_bracket, resolve_groups
+
     groups, _ = resolve_groups()
     matches: list[dict] = []
 

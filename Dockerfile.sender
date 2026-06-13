@@ -1,0 +1,21 @@
+# Imagen LIVIANA solo para el servicio de notificaciones por WhatsApp (sin el predictor).
+# Mucho más chica y rápida que la imagen principal: no instala numpy/scipy/FastAPI.
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Solo las dependencias mínimas del sender.
+COPY requirements-sender.txt .
+RUN pip install --no-cache-dir -r requirements-sender.txt
+
+# Solo lo necesario para armar y enviar los mensajes.
+COPY app ./app
+COPY data ./data
+COPY scripts ./scripts
+
+# Corre el job de partidos UNA vez y termina (ideal para cron / tarea programada).
+# Para otro job: docker run ... python scripts/notify.py <job>
+CMD ["python", "scripts/notify.py", "matches"]
