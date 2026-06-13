@@ -1,0 +1,32 @@
+name: Resumen diario de partidos (WhatsApp)
+
+# Corre todos los días a las 10:30 UTC = 07:30 hora de Argentina (UTC-3, sin horario
+# de verano). GitHub puede demorar unos minutos sobre la hora exacta.
+# Tambien se puede disparar a mano desde la pestaña "Actions" (botón "Run workflow").
+on:
+  schedule:
+    - cron: "30 10 * * *"
+  workflow_dispatch:
+
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Traer el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Instalar dependencias mínimas (sin numpy/scipy)
+        run: pip install -r requirements-sender.txt
+
+      - name: Enviar el resumen del día
+        env:
+          EVOLUTION_API_URL: ${{ secrets.EVOLUTION_API_URL }}
+          EVOLUTION_INSTANCE: ${{ secrets.EVOLUTION_INSTANCE }}
+          EVOLUTION_API_KEY: ${{ secrets.EVOLUTION_API_KEY }}
+          WHATSAPP_PHONES: ${{ secrets.WHATSAPP_PHONES }}
+        run: python scripts/notify.py matches

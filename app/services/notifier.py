@@ -17,11 +17,18 @@ from app.services import whatsapp
 
 
 def _matches_message() -> str:
-    """Resumen de los partidos de hoy (job `matches`)."""
+    """Resumen de los partidos de hoy (job `matches`).
+
+    Devuelve "" en los días sin partidos: así el servicio NO manda nada en las
+    jornadas de descanso (un texto vacío se interpreta como 'saltear').
+    """
     from app.services import daily  # import local: mantiene el módulo liviano
 
     day = daily.today_local()
-    return daily.format_daily_message(daily.todays_matches(day), day)
+    matches = daily.todays_matches(day)
+    if not matches:
+        return ""
+    return daily.format_daily_message(matches, day)
 
 
 # Registro de jobs: nombre -> función que devuelve el texto a enviar.
@@ -45,6 +52,8 @@ async def run_job(job: str, dry_run: bool = False) -> dict:
         text = build_message(job)
     except KeyError as exc:
         return {"status": "error", "error": str(exc)}
+    if not text.strip():
+        return {"status": "skipped", "job": job, "reason": "nada para enviar hoy"}
     if dry_run:
         return {"status": "dry_run", "job": job, "message": text}
     result = await whatsapp.send_to_all(text)

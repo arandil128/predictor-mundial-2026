@@ -42,8 +42,11 @@ def main() -> None:
     result = asyncio.run(notifier.run_job(args.job, dry_run=args.dry_run))
     if args.dry_run and "message" in result:
         print(result["message"])
-    else:
-        print(f"[{result.get('status')}] {result}")
+        return
+    print(f"[{result.get('status')}] {result}")
+    # Salir con error si algo falló, para que el cron/GitHub Action lo marque en rojo.
+    if result.get("status") in ("error", "not_sent"):
+        sys.exit(1)
 
 
 if __name__ == "__main__":

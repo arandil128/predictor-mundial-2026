@@ -1,0 +1,11 @@
+feat: GitHub Actions para el envío diario por WhatsApp (cron, sin servidor)
+
+- .github/workflows/daily-whatsapp.yml: corre todos los días 10:30 UTC (07:30 ART)
+  y también a mano (workflow_dispatch). Instala requirements-sender.txt y ejecuta
+  scripts/notify.py matches. Las claves van por Secrets del repo.
+- notifier: en días sin partidos el job devuelve "" y NO se manda nada (no spamea
+  en jornadas de descanso).
+- notify.py: sale con código != 0 si el envío falla (el Action lo marca en rojo).
+- tests: +3 (dry-run, skip de mensaje vacío, job desconocido). 32 en verde.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>

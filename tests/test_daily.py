@@ -49,6 +49,41 @@ def test_todays_matches_filters_and_sorts():
     assert times == sorted(times)  # ordenados por hora
 
 
+def test_notifier_dry_run_builds_without_sending():
+    import asyncio
+
+    from app.services import notifier
+
+    notifier.JOBS["_t_msg"] = lambda: "hola mundo"
+    try:
+        res = asyncio.run(notifier.run_job("_t_msg", dry_run=True))
+    finally:
+        del notifier.JOBS["_t_msg"]
+    assert res["status"] == "dry_run" and res["message"] == "hola mundo"
+
+
+def test_notifier_skips_empty_message():
+    import asyncio
+
+    from app.services import notifier
+
+    notifier.JOBS["_t_empty"] = lambda: ""  # job sin contenido (ej. día sin partidos)
+    try:
+        res = asyncio.run(notifier.run_job("_t_empty"))
+    finally:
+        del notifier.JOBS["_t_empty"]
+    assert res["status"] == "skipped"  # no intenta enviar
+
+
+def test_notifier_unknown_job():
+    import asyncio
+
+    from app.services import notifier
+
+    res = asyncio.run(notifier.run_job("no_existe"))
+    assert res["status"] == "error"
+
+
 def test_load_phones_sanitizes_and_skips_comment(tmp_path, monkeypatch):
     f = tmp_path / "phones.json"
     f.write_text(json.dumps({
