@@ -11,3 +11,6 @@ venv/
 # Teléfonos reales para WhatsApp (datos personales) y marcador de envío diario
 data/phones.json
 data/.daily_sent
+
+# Archivo temporal de mensajes de commit
+COMMIT_MSG.tmp
