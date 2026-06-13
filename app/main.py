@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from app.config import STATIC_DIR, get_settings
 from app.model import blend as blend_mod
+from app.model import params as params_mod
 from app.model import tournament as tournament_mod
 from app.model.montecarlo import simulate
 from app.services import fixtures, ratings, schedule
@@ -39,6 +40,7 @@ async def api_matches() -> dict:
             "fixtures": settings.has_fixtures,
         },
         "elo_refreshed_at": ratings.last_refresh(),
+        "model_fitted_at": params_mod.fitted_at(),
         "names_es": ratings.names_es_map(),
     }
 
@@ -62,16 +64,19 @@ async def api_simulate(req: SimulateRequest) -> dict:
     elo_away = elo_of(req.away_team)
 
     market = await get_market_probs(req.home_team, req.away_team)
+    # El Mundial se juega en cancha neutral (los anfitriones reciben ventaja
+    # automáticamente dentro del modelo de fuerzas, ver app/model/strengths.py).
     result = blend_mod.blend(
-        elo_home=elo_home,
-        elo_away=elo_away,
-        home_advantage_elo=settings.home_advantage_elo,
+        req.home_team,
+        req.away_team,
+        neutral=True,
         base_lambda=settings.base_lambda,
+        home_advantage_elo=settings.home_advantage_elo,
         market=market,
         market_weight=settings.market_blend_weight,
     )
 
-    sim = simulate(result.lam_home, result.lam_away, req.n_simulations)
+    sim = simulate(result.lam_home, result.lam_away, req.n_simulations, rho=result.rho)
 
     home_rating = get_rating(req.home_team)
     away_rating = get_rating(req.away_team)
@@ -97,6 +102,7 @@ async def api_simulate(req: SimulateRequest) -> dict:
             "model": result.model_probs,
             "market": result.market_probs,
             "market_weight": result.market_weight,
+            "model_basis": result.model_basis,
         },
         "has_market": market is not None,
     }

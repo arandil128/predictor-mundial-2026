@@ -12,9 +12,11 @@ import numpy as np
 from scipy.optimize import least_squares
 from scipy.stats import poisson
 
-# Sensibilidad de la razón de goles a la diferencia de Elo (log-lineal).
-# ~0.0045 por punto Elo: una ventaja de 200 puntos => favorito claro.
-ELO_TO_LOG_GOALS = 0.0045
+# Sensibilidad de la razón de goles a la diferencia de Elo (log-lineal). Calibrado:
+# regresión de la supremacía de goles ajustada (ataque+defensa) contra el Elo de las
+# selecciones da ~0.0029 (correlación 0.93). Solo se usa en el fallback Elo, cuando
+# una selección no tiene fuerza ajustada (ver app/model/strengths.py).
+ELO_TO_LOG_GOALS = 0.0029
 
 # Parámetro de dependencia de Dixon-Coles para marcadores bajos.
 DEFAULT_RHO = -0.05
@@ -61,6 +63,21 @@ def outcome_probs(matrix: np.ndarray) -> tuple[float, float, float]:
     draw = float(np.trace(matrix))
     away = float(np.triu(matrix, 1).sum())  # j > i
     return home, draw, away
+
+
+def sample_from_matrix(
+    matrix: np.ndarray, n: int, rng: np.random.Generator
+) -> tuple[np.ndarray, np.ndarray]:
+    """Muestrea n marcadores (goles_local, goles_visitante) de la matriz Dixon-Coles.
+
+    Muestrear de la matriz —en lugar de dos Poisson independientes— mantiene el
+    Monte Carlo CONSISTENTE con el modelo analítico (incluida la corrección DC).
+    """
+    flat = matrix.ravel()
+    flat = flat / flat.sum()  # robustez ante errores de redondeo
+    cols = matrix.shape[1]
+    idx = rng.choice(flat.size, size=n, p=flat)
+    return idx // cols, idx % cols
 
 
 def _residuals(log_lams, target_home, target_away, rho):

@@ -15,10 +15,20 @@ import json
 import numpy as np
 
 from app.config import DATA_DIR
-from app.model.poisson import lambdas_from_elo
+from app.model import strengths
+from app.model.poisson import score_matrix
 from app.services.ratings import all_teams, elo_of, get_rating
 
 BASE_LAMBDA = 1.35
+# Proporción de un partido que dura el alargue (30' sobre 90') — escala los goles.
+# El alargue suele jugarse algo más cauto que el tiempo regular; 30/90 es la
+# aproximación proporcional (null razonable, sin datos finos para afinarlo).
+EXTRA_TIME_FRACTION = 30.0 / 90.0
+# Sensibilidad de la tanda de penales a la diferencia de Elo: muy baja a propósito.
+# Los penales son casi una moneda al aire; el mejor equipo apenas se favorece
+# (0.0005 ⇒ una ventaja de 200 Elo da ~58%), con tope en [0.30, 0.70].
+SHOOTOUT_ELO_SCALE = 0.0005
+SHOOTOUT_CLIP = (0.30, 0.70)
 GROUP_LETTERS = [chr(ord("A") + i) for i in range(12)]
 # Etiquetas de las rondas alcanzadas (de menor a mayor).
 STAGES = ["r32", "r16", "qf", "sf", "final", "champion"]
@@ -70,34 +80,52 @@ def resolve_groups() -> tuple[dict[str, list[str]], bool]:
 
 
 class _Engine:
-    """Cachea Elo y lambdas por par para acelerar las N simulaciones."""
+    """Cachea fuerzas y la distribución de marcadores por par para acelerar las sims.
+
+    Usa el modelo Dixon-Coles ataque/defensa (app/model/strengths.py): los anfitriones
+    reciben ventaja automáticamente y los goles totales dependen del cruce. Los
+    marcadores se muestrean de la matriz Dixon-Coles (no de Poisson independientes),
+    consistente con la predicción de cada partido.
+    """
 
     def __init__(self, teams: list[str]):
         self.elo = {t: elo_of(t) for t in teams}
-        self._lam: dict[tuple[str, str], tuple[float, float]] = {}
+        self.rho = strengths.current_rho()
+        self._samplers: dict[tuple[str, str, bool], tuple[np.ndarray, int]] = {}
 
-    def lambdas(self, a: str, b: str) -> tuple[float, float]:
-        key = (a, b)
-        cached = self._lam.get(key)
+    def _sampler(self, a: str, b: str, extra_time: bool) -> tuple[np.ndarray, int]:
+        """(cumsum aplanada, n_columnas) de la matriz de marcadores del par a-b."""
+        key = (a, b, extra_time)
+        cached = self._samplers.get(key)
         if cached is None:
-            cached = lambdas_from_elo(
-                self.elo[a], self.elo[b], home_advantage_elo=0.0, base_lambda=BASE_LAMBDA
-            )
-            self._lam[key] = cached
+            la, lb = strengths.goal_lambdas(a, b, neutral=True, base_lambda=BASE_LAMBDA)
+            if extra_time:  # solo se juegan 30' → menos goles esperados
+                la, lb = la * EXTRA_TIME_FRACTION, lb * EXTRA_TIME_FRACTION
+            matrix = score_matrix(la, lb, rho=self.rho)
+            cached = (np.cumsum(matrix.ravel()), matrix.shape[1])
+            self._samplers[key] = cached
         return cached
 
+    def _draw(self, rng, a: str, b: str, extra_time: bool = False) -> tuple[int, int]:
+        cumsum, cols = self._sampler(a, b, extra_time)
+        idx = int(np.searchsorted(cumsum, rng.random() * cumsum[-1], side="right"))
+        idx = min(idx, cumsum.size - 1)
+        return idx // cols, idx % cols
+
     def play(self, rng, a: str, b: str) -> tuple[int, int]:
-        la, lb = self.lambdas(a, b)
-        return int(rng.poisson(la)), int(rng.poisson(lb))
+        return self._draw(rng, a, b)
 
     def knockout_winner(self, rng, a: str, b: str) -> str:
-        ga, gb = self.play(rng, a, b)
-        if ga > gb:
-            return a
-        if gb > ga:
-            return b
-        # Empate -> "penales": probabilidad por expectativa Elo.
-        pa = 1.0 / (1.0 + 10 ** (-(self.elo[a] - self.elo[b]) / 400))
+        ga, gb = self._draw(rng, a, b)
+        if ga != gb:
+            return a if ga > gb else b
+        # Empate en los 90': se juega alargue (30').
+        ea, eb = self._draw(rng, a, b, extra_time=True)
+        if ea != eb:
+            return a if ea > eb else b
+        # Sigue empatado -> penales: casi una moneda al aire, leve sesgo por Elo.
+        pa = 0.5 + SHOOTOUT_ELO_SCALE * (self.elo[a] - self.elo[b])
+        pa = min(SHOOTOUT_CLIP[1], max(SHOOTOUT_CLIP[0], pa))
         return a if rng.random() < pa else b
 
 

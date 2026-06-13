@@ -23,7 +23,7 @@
 - 🎲 **Monte Carlo configurable**: vos elegís cuántas simulaciones correr. Más simulaciones ⇒ estimaciones más estables.
 - 📊 **Datos en vivo**: consulta cuotas y ratings en el momento de simular (con caché corta para respetar los límites de las APIs gratuitas).
 - ↻ **Refresco de Elo a requerimiento**: un botón descarga los ratings actuales desde una fuente abierta (gratis, sin clave) — sin polling automático, no gasta tus APIs.
-- 🧮 **Modelo híbrido**: el mercado de apuestas como ancla + modelo Elo/FIFA, mezclados con un peso configurable.
+- 🧮 **Modelo híbrido**: ataque/defensa Dixon-Coles ajustado con datos abiertos (con fallback Elo) + el mercado de apuestas como ancla, mezclados con un peso configurable.
 - 🎨 **UI minimalista**: una sola pantalla con pestañas Partido / Torneo, responsive.
 - 🔌 **Funciona sin claves**: arranca con un dataset Elo semilla y suma las cuotas cuando configurás las APIs.
 
@@ -32,17 +32,48 @@
 ## 🧠 Cómo funciona el modelo
 
 ```
-Cuotas 1X2 (casas)  ──►  prob. implícitas sin vig  ──┐
-                                                      ├──►  λ local / λ visitante  ──►  Monte Carlo (N sims)  ──►  predicción
-Elo + ranking FIFA  ──►  goles esperados (localía)  ──┘                                  Poisson + Dixon-Coles
+Cuotas 1X2 (casas)        ──►  prob. implícitas sin vig  ──┐
+                                                           ├─►  λ local / λ visitante  ─►  Monte Carlo (N sims)  ─►  predicción
+Ataque/Defensa (Dixon-Coles, datos abiertos)  ─► goles  ──┘    muestreando de la matriz Dixon-Coles
+   (fallback Elo si falta histórico)
 ```
 
-1. **Mercado como ancla** — las cuotas decimales se convierten a probabilidad (`1/cuota`) y se les quita el margen de la casa (*vig*).
-2. **Fuerza de equipos** — la diferencia de Elo (más la ventaja de localía) define los goles esperados de cada selección.
-3. **Calibración + mezcla** — se calibran los goles esperados para reproducir el mercado y se mezclan con el modelo Elo (peso `MARKET_BLEND_WEIGHT`).
-4. **Monte Carlo** — se simulan *N* partidos muestreando goles de sendas distribuciones Poisson; el cálculo analítico aplica la corrección **Dixon-Coles** para marcadores bajos.
+1. **Fuerza de equipos — ataque y defensa independientes.** Cada selección tiene un parámetro de **ataque** (cuánto marca) y otro de **defensa** (cuánto evita que le marquen), ajustados con un modelo **Dixon-Coles** sobre miles de partidos internacionales reales (datos abiertos, dominio público). A diferencia de un Elo único, esto hace que **los goles totales dependan del cruce**: un goleador contra una defensa floja produce muchos goles; dos defensas sólidas, pocos.
 
-> Si todavía no hay cuotas para un cruce (lo habitual hasta cerca del torneo), el modelo trabaja solo con Elo/FIFA y lo avisa en la interfaz.
+   ```
+   log λ_local = μ + ventaja_anfitrión + ataque[local] − defensa[visitante]
+   log λ_visit = μ +                     ataque[visit]  − defensa[local]
+   ```
+2. **Sede neutral + anfitriones.** El Mundial se juega en cancha neutral, así que por defecto **no hay ventaja de localía**. La excepción son los anfitriones (🇺🇸/🇲🇽/🇨🇦), que reciben la ventaja calibrada cuando enfrentan a un no-anfitrión.
+3. **Mercado como ancla (opcional).** Si hay cuotas, se convierten a probabilidad sin *vig*, se calibran a λ y se mezclan con el modelo de fuerzas (peso `MARKET_BLEND_WEIGHT`).
+4. **Monte Carlo consistente.** Se simulan *N* partidos **muestreando de la misma matriz Dixon-Coles** que produce las probabilidades analíticas (antes muestreaba Poisson independientes, lo que sesgaba empates/marcadores bajos). En la eliminatoria se juega **alargue** antes de los **penales** (estos casi una moneda al aire, con leve sesgo por Elo).
+
+> Si una selección no tiene histórico suficiente, ese cruce cae automáticamente al modelo **Elo** y todo sigue funcionando. La calibración es opcional: sin `data/model_params.json` la app arranca con Elo.
+
+### 🔬 Calibrar el modelo con datos abiertos
+
+```bash
+python scripts/calibrate.py            # baja resultados reales y ajusta ataque/defensa
+python scripts/calibrate.py --since 2014 --half-life 1095 --reg 5
+```
+
+Descarga el dataset público [martj42/international_results](https://github.com/martj42/international_results) (CC0, todos los internacionales A), pondera los partidos por **recencia** (vida media configurable) e **importancia** (un Mundial pesa más que un amistoso) y ajusta por máxima verosimilitud `ataque`/`defensa` por selección + `μ`, ventaja de anfitrión y `ρ` (Dixon-Coles). Escribe `data/model_params.json`, que la app carga al arrancar.
+
+### 📈 Validación (backtest out-of-sample)
+
+```bash
+python scripts/backtest.py     # entrena hasta 2023, valida 2023, evalúa 2024+
+```
+
+`scripts/backtest.py` hace validación temporal sin filtraciones (entrena con datos viejos, evalúa con partidos que el modelo **nunca vio**) y compara el modelo nuevo contra el viejo (Elo de razón-constante) y un baseline. Sobre **2.541 partidos de 2024–2026**, el modelo ataque/defensa gana en todas las métricas:
+
+| modelo | log-loss | Brier | RPS | log-vero. marcador | MAE goles totales |
+|---|---|---|---|---|---|
+| baseline | 1.054 | 0.636 | 0.227 | −3.204 | 1.455 |
+| Elo razón-constante (viejo) | 0.893 | 0.525 | 0.173 | −2.948 | 1.531 |
+| **ataque/defensa (nuevo)** | **0.864** | **0.508** | **0.167** | **−2.860** | **1.400** |
+
+El dato clave: el Elo viejo predice el **total de goles peor que el baseline** (1.531 vs 1.455) — es el síntoma del supuesto de goles-totales-constantes. El modelo nuevo lo corrige (1.400) y además acierta mejor el **marcador exacto** (log-verosimilitud). La curva de calibración (predicho vs observado) es casi perfecta, así que no hace falta recalibrar.
 
 ---
 
@@ -126,14 +157,20 @@ app/
     ratings.py         carga Elo/FIFA (CSV semilla)
     cache.py           caché en memoria con TTL
   model/
-    poisson.py         λ desde Elo, matriz Dixon-Coles, calibración al mercado
-    montecarlo.py      motor de N simulaciones (partido)
+    poisson.py         matriz Dixon-Coles, muestreo, calibración al mercado
+    fitting.py         ajuste por MLE del modelo ataque/defensa (gradiente analítico)
+    strengths.py       λ por ataque/defensa (o Elo de fallback) + anfitriones
+    params.py          carga los parámetros calibrados (model_params.json)
+    montecarlo.py      motor de N simulaciones (muestrea de la matriz DC)
     tournament.py      simulación del Mundial completo (grupos + eliminatoria)
-    blend.py           mezcla mercado ↔ modelo
+    blend.py           mezcla mercado ↔ modelo de fuerzas (en espacio log)
 data/elo_ratings.csv   ratings semilla / fallback
+data/model_params.json ataque/defensa + μ/ventaja/ρ calibrados (lo crea calibrate.py)
 data/groups_2026.json  grupos oficiales del sorteo (editable)
+scripts/calibrate.py   ajusta el modelo con datos abiertos de partidos reales
+scripts/backtest.py    validación out-of-sample (nuevo vs viejo vs baseline)
 static/                index.html + app.js (UI)
-tests/                 sanidad del modelo
+tests/                 sanidad del modelo + chequeo de gradiente
 Dockerfile             imagen para EasyPanel / Docker
 render.yaml            blueprint para Render
 ```
